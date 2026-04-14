@@ -41,14 +41,14 @@ CONFIG = {
 SYSTEM_PROMPT_DE = (
     "Du bist Pi-Bot, ein freundlicher Roboter-Assistent auf einem Raspberry Pi. "
     "Du antwortest kurz und knapp auf Deutsch. Du hast einen trockenen Humor. "
-    "Wenn jemand nach einem Witz fragt, benutze das lookup_german_joke Tool. "
+    "Wenn jemand nach einem Witz fragt, benutze das get_random_joke Tool. "
     "Halte deine Antworten unter 3 Saetzen, ausser es wird mehr verlangt."
 )
 
 SYSTEM_PROMPT_EN = (
     "You are Pi-Bot, a friendly robot assistant running on a Raspberry Pi. "
     "You answer briefly in English. You have dry humor. "
-    "If someone asks for a joke, use the lookup_german_joke tool. "
+    "If someone asks for a joke, use the get_random_joke tool. "
     "Keep responses under 3 sentences unless more is requested."
 )
 
@@ -59,20 +59,12 @@ TOOLS = [
     {
         "type": "function",
         "function": {
-            "name": "lookup_german_joke",
-            "description": (
-                "Look up a German joke by keyword or category. "
-                "Categories: Informatiker, Tier, Schule, Allgemein, Wortspiel"
-            ),
+            "name": "get_random_joke",
+            "description": "Returns a random German joke.",
             "parameters": {
                 "type": "object",
-                "properties": {
-                    "query": {
-                        "type": "string",
-                        "description": "A keyword or category to search for",
-                    }
-                },
-                "required": ["query"],
+                "properties": {},
+                "required": [],
             },
         },
     }
@@ -172,27 +164,15 @@ def record_until_silence():
 # ---------------------------------------------------------------------------
 # Tool execution
 # ---------------------------------------------------------------------------
-def lookup_german_joke(query, jokes_db):
-    """Search jokes by keyword or category. Returns JSON string."""
-    query_lower = query.lower()
-    matches = []
-    for joke in jokes_db:
-        if query_lower in joke["category"].lower():
-            matches.append(joke)
-        elif any(query_lower in kw.lower() for kw in joke["keywords"]):
-            matches.append(joke)
-
-    if not matches:
-        joke = random.choice(jokes_db)
-    else:
-        joke = random.choice(matches)
-    return json.dumps(joke, ensure_ascii=False)
+def get_random_joke(jokes_db):
+    """Return a random joke as a JSON string."""
+    return json.dumps(random.choice(jokes_db), ensure_ascii=False)
 
 
 def execute_tool(name, args, jokes_db):
     """Dispatch a tool call and return the result as a string."""
-    if name == "lookup_german_joke":
-        return lookup_german_joke(args.get("query", ""), jokes_db)
+    if name == "get_random_joke":
+        return get_random_joke(jokes_db)
     return json.dumps({"error": f"Unknown tool: {name}"})
 
 

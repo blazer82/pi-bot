@@ -80,15 +80,11 @@ Edit `jokes.json`. Each joke has this structure:
 
 ```json
 {
-  "id": 21,
-  "category": "Allgemein",
-  "keywords": ["keyword1", "keyword2"],
+  "id": 121,
   "setup": "The setup line",
   "punchline": "The punchline"
 }
 ```
-
-Categories: `Informatiker`, `Tier`, `Schule`, `Allgemein`, `Wortspiel` (or add your own).
 
 ## Adding Tools
 

@@ -7,7 +7,7 @@ class TestConfig:
     def test_config_has_required_keys(self):
         required = [
             "language", "ollama_model", "ollama_url", "whisper_model",
-            "wake_word", "wake_threshold", "silence_threshold",
+            "wake_model", "wake_threshold", "silence_threshold",
             "silence_duration", "max_record_seconds", "sample_rate",
             "context_turns", "followup_timeout", "espeak_speed",
             "espeak_pitch", "mic_device", "speaker_device",

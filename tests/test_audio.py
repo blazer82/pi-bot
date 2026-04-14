@@ -95,10 +95,12 @@ class TestListenForWakeWord:
         stream.__exit__ = mock.MagicMock(return_value=False)
         mock_is_cls.return_value = stream
 
+        from pi_bot.audio import _WAKE_KEY
+
         wake_model = mock.MagicMock()
         wake_model.predict.side_effect = [
-            {CONFIG["wake_word"]: 0.1},
-            {CONFIG["wake_word"]: 0.9},
+            {_WAKE_KEY: 0.1},
+            {_WAKE_KEY: 0.9},
         ]
 
         listen_for_wake_word(wake_model)

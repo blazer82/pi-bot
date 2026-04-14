@@ -1,5 +1,7 @@
 """Audio capture: wake word detection and recording."""
 
+import os
+
 import numpy as np
 
 try:
@@ -8,6 +10,9 @@ except ImportError:
     sd = None
 
 from pi_bot.config import CONFIG
+
+# openWakeWord uses the filename stem (without .onnx) as the prediction key
+_WAKE_KEY = os.path.splitext(os.path.basename(CONFIG["wake_model"]))[0]
 
 
 def listen_for_wake_word(wake_model):
@@ -23,7 +28,7 @@ def listen_for_wake_word(wake_model):
         while True:
             audio, _ = stream.read(chunk_size)
             prediction = wake_model.predict(audio.flatten())
-            if prediction.get(CONFIG["wake_word"], 0) > CONFIG["wake_threshold"]:
+            if prediction.get(_WAKE_KEY, 0) > CONFIG["wake_threshold"]:
                 return
 
 

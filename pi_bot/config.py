@@ -1,5 +1,9 @@
 """Configuration, system prompts, and tool definitions."""
 
+import os
+
+_REPO_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 # ---------------------------------------------------------------------------
 # Configuration — edit these to taste
 # ---------------------------------------------------------------------------
@@ -8,7 +12,7 @@ CONFIG = {
     "ollama_model": "gemma4:e2b-it-q4_K_M",
     "ollama_url": "http://localhost:11434",
     "whisper_model": "small",               # tiny, base, small, medium
-    "wake_word": "hey_jarvis",              # openWakeWord model name
+    "wake_model": os.path.join(_REPO_DIR, "models", "hey_pee_bot.onnx"),
     "wake_threshold": 0.5,                  # 0.0–1.0
     "silence_threshold": 500,               # RMS energy below this = silence
     "silence_duration": 1.5,                # seconds of silence to stop recording

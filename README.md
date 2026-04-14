@@ -86,6 +86,15 @@ Edit `jokes.json`. Each joke has this structure:
 }
 ```
 
+## Testing
+
+```bash
+python3 -m pip install pytest
+python3 -m pytest test_pi_bot.py -v
+```
+
+All hardware and API dependencies are mocked, so tests run without a microphone, speaker, ollama, or espeak-ng.
+
 ## Adding Tools
 
 1. Add a tool definition to the `TOOLS` list in `pi_bot.py` (ollama JSON schema format)

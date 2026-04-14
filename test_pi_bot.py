@@ -66,11 +66,146 @@ class TestGetRandomJoke:
         assert result == SAMPLE_JOKES[0]
 
 
+class TestGetWeatherForecast:
+    MOCK_FORECAST_RESPONSE = {
+        "daily": {
+            "time": ["2026-04-14", "2026-04-15", "2026-04-16"],
+            "temperature_2m_max": [18.5, 20.1, 16.3],
+            "temperature_2m_min": [8.2, 10.0, 7.5],
+            "precipitation_sum": [0.0, 2.3, 5.1],
+            "weathercode": [0, 61, 63],
+        }
+    }
+
+    @mock.patch("pi_bot.requests.get")
+    def test_successful_forecast(self, mock_get):
+        mock_response = mock.MagicMock()
+        mock_response.json.return_value = self.MOCK_FORECAST_RESPONSE
+        mock_get.return_value = mock_response
+
+        result = json.loads(pi_bot.get_weather_forecast())
+        assert result["location"] == pi_bot.CONFIG["location_name"]
+        assert len(result["forecast"]) == 3
+        day = result["forecast"][0]
+        assert "date" in day
+        assert "temp_max" in day
+        assert "temp_min" in day
+        assert "precipitation_mm" in day
+        assert "conditions" in day
+
+    @mock.patch("pi_bot.requests.get")
+    def test_api_error(self, mock_get):
+        mock_get.side_effect = Exception("Connection refused")
+        result = json.loads(pi_bot.get_weather_forecast())
+        assert "error" in result
+
+
+class _MockAddr:
+    """Minimal stand-in for psutil network address with a .family.name attribute."""
+    def __init__(self, family_name, address):
+        self.family = mock.MagicMock(name=family_name)
+        self.family.name = family_name
+        self.address = address
+
+
+class TestGetSystemStatus:
+    MOCK_NET_ADDRS = {"eth0": [_MockAddr("AF_INET", "192.168.1.42")]}
+    MOCK_NET_LOOPBACK_ONLY = {"lo": [_MockAddr("AF_INET", "127.0.0.1")]}
+
+    @mock.patch("pi_bot.requests.head")
+    @mock.patch("pi_bot.psutil.net_if_addrs")
+    @mock.patch("pi_bot.psutil.cpu_percent", return_value=25.0)
+    @mock.patch("pi_bot.psutil.boot_time", return_value=1744500000.0)
+    @mock.patch("pi_bot.psutil.virtual_memory")
+    @mock.patch("pi_bot.shutil.disk_usage")
+    def test_successful_status(self, mock_disk, mock_mem, mock_boot, mock_cpu, mock_net, mock_head):
+        mock_temps = mock.MagicMock(return_value={"cpu_thermal": [mock.MagicMock(current=42.0)]})
+        mock_mem.return_value = mock.MagicMock(percent=60.5, available=2 * 1024 * 1024 * 1024)
+        mock_disk.return_value = mock.MagicMock(total=32 * 1024**3, used=16 * 1024**3, free=16 * 1024**3)
+        mock_net.return_value = self.MOCK_NET_ADDRS
+
+        with mock.patch.object(pi_bot.psutil, "sensors_temperatures", mock_temps, create=True):
+            result = json.loads(pi_bot.get_system_status())
+        assert result["cpu_temp_c"] == 42.0
+        assert result["cpu_percent"] == 25.0
+        assert result["memory_used_percent"] == 60.5
+        assert "memory_available_mb" in result
+        assert "disk_used_percent" in result
+        assert "disk_free_gb" in result
+        assert "uptime" in result
+        assert result["network_connected"] is True
+        assert result["internet_connected"] is True
+
+    @mock.patch("pi_bot.requests.head", side_effect=Exception("no internet"))
+    @mock.patch("pi_bot.psutil.net_if_addrs")
+    @mock.patch("pi_bot.psutil.cpu_percent", return_value=10.0)
+    @mock.patch("pi_bot.psutil.boot_time", return_value=1744500000.0)
+    @mock.patch("pi_bot.psutil.virtual_memory")
+    @mock.patch("pi_bot.shutil.disk_usage")
+    def test_network_but_no_internet(self, mock_disk, mock_mem, mock_boot, mock_cpu, mock_net, mock_head):
+        mock_mem.return_value = mock.MagicMock(percent=50.0, available=1024 * 1024 * 1024)
+        mock_disk.return_value = mock.MagicMock(total=32 * 1024**3, used=16 * 1024**3, free=16 * 1024**3)
+        mock_net.return_value = self.MOCK_NET_ADDRS
+
+        result = json.loads(pi_bot.get_system_status())
+        assert result["network_connected"] is True
+        assert result["internet_connected"] is False
+
+    @mock.patch("pi_bot.psutil.net_if_addrs")
+    @mock.patch("pi_bot.psutil.cpu_percent", return_value=10.0)
+    @mock.patch("pi_bot.psutil.boot_time", return_value=1744500000.0)
+    @mock.patch("pi_bot.psutil.virtual_memory")
+    @mock.patch("pi_bot.shutil.disk_usage")
+    def test_no_network(self, mock_disk, mock_mem, mock_boot, mock_cpu, mock_net):
+        mock_mem.return_value = mock.MagicMock(percent=50.0, available=1024 * 1024 * 1024)
+        mock_disk.return_value = mock.MagicMock(total=32 * 1024**3, used=16 * 1024**3, free=16 * 1024**3)
+        mock_net.return_value = self.MOCK_NET_LOOPBACK_ONLY
+
+        result = json.loads(pi_bot.get_system_status())
+        assert result["network_connected"] is False
+        assert result["internet_connected"] is False
+
+    @mock.patch("pi_bot.requests.head")
+    @mock.patch("pi_bot.psutil.net_if_addrs")
+    @mock.patch("pi_bot.psutil.cpu_percent", return_value=10.0)
+    @mock.patch("pi_bot.psutil.boot_time", return_value=1744500000.0)
+    @mock.patch("pi_bot.psutil.virtual_memory")
+    @mock.patch("pi_bot.shutil.disk_usage")
+    def test_no_temp_sensors(self, mock_disk, mock_mem, mock_boot, mock_cpu, mock_net, mock_head):
+        mock_mem.return_value = mock.MagicMock(percent=50.0, available=1024 * 1024 * 1024)
+        mock_disk.return_value = mock.MagicMock(total=32 * 1024**3, used=16 * 1024**3, free=16 * 1024**3)
+        mock_net.return_value = self.MOCK_NET_ADDRS
+
+        result = json.loads(pi_bot.get_system_status())
+        assert result["cpu_temp_c"] is None
+
+    @mock.patch("pi_bot.psutil.cpu_percent", side_effect=Exception("fail"))
+    def test_error_handling(self, mock_cpu):
+        result = json.loads(pi_bot.get_system_status())
+        assert "error" in result
+
+
 class TestExecuteTool:
     def test_known_tool(self):
         result = pi_bot.execute_tool("get_random_joke", {}, SAMPLE_JOKES)
         parsed = json.loads(result)
         assert parsed in SAMPLE_JOKES
+
+    @mock.patch("pi_bot.get_weather_forecast")
+    def test_weather_tool_dispatch(self, mock_weather):
+        mock_weather.return_value = '{"location": "Frankfurt am Main", "forecast": []}'
+        result = pi_bot.execute_tool("get_weather_forecast", {}, SAMPLE_JOKES)
+        mock_weather.assert_called_once()
+        parsed = json.loads(result)
+        assert parsed["location"] == "Frankfurt am Main"
+
+    @mock.patch("pi_bot.get_system_status")
+    def test_system_status_dispatch(self, mock_status):
+        mock_status.return_value = '{"cpu_percent": 25.0}'
+        result = pi_bot.execute_tool("get_system_status", {}, SAMPLE_JOKES)
+        mock_status.assert_called_once()
+        parsed = json.loads(result)
+        assert parsed["cpu_percent"] == 25.0
 
     def test_unknown_tool(self):
         result = pi_bot.execute_tool("nonexistent", {}, SAMPLE_JOKES)
@@ -335,9 +470,9 @@ class TestStreamAndSpeak:
                 {"type": "content", "text": "<think>thinking</think>Answer."},
             ])
             pi_bot.stream_and_speak([])
-            # Should have spoken "Analysiere..." cue
+            # Should have spoken "Moment..." cue
             spoken_texts = [call[0][0] for call in mock_speak.call_args_list]
-            assert any("Analysiere" in t for t in spoken_texts)
+            assert any("Moment" in t for t in spoken_texts)
         finally:
             pi_bot.CONFIG["language"] = original_lang
 
@@ -416,7 +551,8 @@ class TestChatWithOllama:
             history = []
             pi_bot.chat_with_ollama("Hallo", history, SAMPLE_JOKES)
             messages = mock_sas.call_args[0][0]
-            assert messages[0]["content"] == pi_bot.SYSTEM_PROMPT_DE
+            assert messages[0]["content"].startswith(pi_bot.SYSTEM_PROMPT_DE)
+            assert "Aktuelles Datum und Uhrzeit:" in messages[0]["content"]
         finally:
             pi_bot.CONFIG["language"] = original
 
@@ -429,7 +565,8 @@ class TestChatWithOllama:
             history = []
             pi_bot.chat_with_ollama("Hello", history, SAMPLE_JOKES)
             messages = mock_sas.call_args[0][0]
-            assert messages[0]["content"] == pi_bot.SYSTEM_PROMPT_EN
+            assert messages[0]["content"].startswith(pi_bot.SYSTEM_PROMPT_EN)
+            assert "Current date and time:" in messages[0]["content"]
         finally:
             pi_bot.CONFIG["language"] = original
 
@@ -569,10 +706,11 @@ class TestConfig:
             assert key in pi_bot.CONFIG, f"Missing config key: {key}"
 
     def test_tools_schema_valid(self):
-        assert len(pi_bot.TOOLS) == 1
-        tool = pi_bot.TOOLS[0]
-        assert tool["type"] == "function"
-        assert tool["function"]["name"] == "get_random_joke"
+        assert len(pi_bot.TOOLS) == 3
+        names = {t["function"]["name"] for t in pi_bot.TOOLS}
+        assert names == {"get_random_joke", "get_weather_forecast", "get_system_status"}
+        for tool in pi_bot.TOOLS:
+            assert tool["type"] == "function"
 
     def test_system_prompts_defined(self):
         assert len(pi_bot.SYSTEM_PROMPT_DE) > 0

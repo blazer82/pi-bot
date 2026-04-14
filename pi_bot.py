@@ -3,6 +3,8 @@
 
 import json
 import os
+import shutil
+from datetime import datetime
 import random
 import re
 import subprocess
@@ -10,6 +12,7 @@ import tempfile
 import wave
 
 import numpy as np
+import psutil
 import requests
 try:
     import sounddevice as sd
@@ -34,13 +37,16 @@ CONFIG = {
     "silence_duration": 1.5,                # seconds of silence to stop recording
     "max_record_seconds": 15,               # safety cap
     "sample_rate": 16000,
-    "context_turns": 6,                     # keep last N user/assistant pairs
+    "context_turns": 25,                    # keep last N user/assistant pairs
     "followup_timeout": 8,                  # seconds to wait for follow-up speech
     "thinking": False,                     # enable <think> reasoning in ollama
     "espeak_speed": 130,                    # words per minute
     "espeak_pitch": 40,                     # 0–99, lower = deeper
     "mic_device": None,                     # None = default, or int device index
     "speaker_device": None,                 # None = default, or int device index
+    "location_name": "Frankfurt am Main",
+    "location_lat": 50.1109,
+    "location_lon": 8.6821,
 }
 
 # ---------------------------------------------------------------------------
@@ -49,14 +55,20 @@ CONFIG = {
 SYSTEM_PROMPT_DE = (
     "Du bist Pi-Bot, ein freundlicher Roboter-Assistent auf einem Raspberry Pi. "
     "Du antwortest kurz und knapp auf Deutsch. Du hast einen trockenen Humor. "
+    "Du befindest dich in Frankfurt am Main. "
     "Wenn jemand nach einem Witz fragt, benutze das get_random_joke Tool. "
+    "Wenn jemand nach dem Wetter fragt, benutze das get_weather_forecast Tool. "
+    "Wenn jemand fragt wie es dir geht, benutze das get_system_status Tool und antworte kreativ basierend auf deinem Systemzustand. "
     "Halte deine Antworten unter 3 Saetzen, ausser es wird mehr verlangt."
 )
 
 SYSTEM_PROMPT_EN = (
     "You are Pi-Bot, a friendly robot assistant running on a Raspberry Pi. "
     "You answer briefly in English. You have dry humor. "
+    "You are located in Frankfurt am Main. "
     "If someone asks for a joke, use the get_random_joke tool. "
+    "If someone asks about the weather, use the get_weather_forecast tool. "
+    "If someone asks how you are doing, use the get_system_status tool and answer creatively based on your system state. "
     "Keep responses under 3 sentences unless more is requested."
 )
 
@@ -75,7 +87,31 @@ TOOLS = [
                 "required": [],
             },
         },
-    }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_weather_forecast",
+            "description": "Returns a weather forecast for the bot's location (Frankfurt am Main). Returns temperature, precipitation, and conditions for the next 3 days.",
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_system_status",
+            "description": "Returns system status of the Raspberry Pi: CPU temperature, CPU usage, memory usage, disk usage, and uptime.",
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+            },
+        },
+    },
 ]
 
 
@@ -227,6 +263,128 @@ def wait_for_followup():
 # ---------------------------------------------------------------------------
 # Tool execution
 # ---------------------------------------------------------------------------
+WMO_WEATHER_CODES = {
+    0: ("Klar", "Clear sky"),
+    1: ("Überwiegend klar", "Mainly clear"),
+    2: ("Teilweise bewölkt", "Partly cloudy"),
+    3: ("Bewölkt", "Overcast"),
+    45: ("Nebel", "Fog"),
+    48: ("Raunebel", "Depositing rime fog"),
+    51: ("Leichter Nieselregen", "Light drizzle"),
+    53: ("Mäßiger Nieselregen", "Moderate drizzle"),
+    55: ("Starker Nieselregen", "Dense drizzle"),
+    61: ("Leichter Regen", "Slight rain"),
+    63: ("Mäßiger Regen", "Moderate rain"),
+    65: ("Starker Regen", "Heavy rain"),
+    66: ("Leichter Gefrierregen", "Light freezing rain"),
+    67: ("Starker Gefrierregen", "Heavy freezing rain"),
+    71: ("Leichter Schneefall", "Slight snowfall"),
+    73: ("Mäßiger Schneefall", "Moderate snowfall"),
+    75: ("Starker Schneefall", "Heavy snowfall"),
+    77: ("Schneegriesel", "Snow grains"),
+    80: ("Leichte Regenschauer", "Slight rain showers"),
+    81: ("Mäßige Regenschauer", "Moderate rain showers"),
+    82: ("Heftige Regenschauer", "Violent rain showers"),
+    85: ("Leichte Schneeschauer", "Slight snow showers"),
+    86: ("Starke Schneeschauer", "Heavy snow showers"),
+    95: ("Gewitter", "Thunderstorm"),
+    96: ("Gewitter mit leichtem Hagel", "Thunderstorm with slight hail"),
+    99: ("Gewitter mit starkem Hagel", "Thunderstorm with heavy hail"),
+}
+
+
+def get_weather_forecast():
+    """Fetch a 3-day weather forecast from Open-Meteo for the configured location."""
+    try:
+        r = requests.get(
+            "https://api.open-meteo.com/v1/forecast",
+            params={
+                "latitude": CONFIG["location_lat"],
+                "longitude": CONFIG["location_lon"],
+                "daily": "temperature_2m_max,temperature_2m_min,precipitation_sum,weathercode",
+                "timezone": "auto",
+                "forecast_days": 3,
+            },
+            timeout=10,
+        )
+        r.raise_for_status()
+        data = r.json()
+    except Exception as e:
+        return json.dumps({"error": f"Weather API error: {e}"}, ensure_ascii=False)
+
+    daily = data.get("daily", {})
+    lang_idx = 0 if CONFIG["language"] == "de" else 1
+    days = []
+    for i in range(len(daily.get("time", []))):
+        code = daily["weathercode"][i]
+        desc = WMO_WEATHER_CODES.get(code, ("Unbekannt", "Unknown"))[lang_idx]
+        days.append({
+            "date": daily["time"][i],
+            "temp_max": daily["temperature_2m_max"][i],
+            "temp_min": daily["temperature_2m_min"][i],
+            "precipitation_mm": daily["precipitation_sum"][i],
+            "conditions": desc,
+        })
+
+    return json.dumps({
+        "location": CONFIG["location_name"],
+        "forecast": days,
+    }, ensure_ascii=False)
+
+
+def get_system_status():
+    """Return system status (CPU temp, CPU usage, memory, disk, uptime)."""
+    try:
+        cpu_temp = None
+        if hasattr(psutil, "sensors_temperatures"):
+            temps = psutil.sensors_temperatures()
+            if temps:
+                for entries in temps.values():
+                    if entries:
+                        cpu_temp = entries[0].current
+                        break
+
+        mem = psutil.virtual_memory()
+        disk = shutil.disk_usage("/")
+        uptime_s = int(psutil.boot_time())
+        uptime_delta = datetime.now() - datetime.fromtimestamp(uptime_s)
+        hours, remainder = divmod(int(uptime_delta.total_seconds()), 3600)
+        minutes = remainder // 60
+
+        # Network connectivity
+        network_connected = False
+        for addrs in psutil.net_if_addrs().values():
+            for addr in addrs:
+                if addr.family.name in ("AF_INET", "AF_INET6") and not addr.address.startswith("127.") and addr.address != "::1":
+                    network_connected = True
+                    break
+            if network_connected:
+                break
+
+        internet_connected = False
+        if network_connected:
+            try:
+                requests.head("http://clients3.google.com/generate_204", timeout=3)
+                internet_connected = True
+            except Exception:
+                pass
+
+        status = {
+            "cpu_temp_c": cpu_temp,
+            "cpu_percent": psutil.cpu_percent(interval=0.5),
+            "memory_used_percent": mem.percent,
+            "memory_available_mb": round(mem.available / 1024 / 1024),
+            "disk_used_percent": round(disk.used / disk.total * 100, 1),
+            "disk_free_gb": round(disk.free / 1024 / 1024 / 1024, 1),
+            "uptime": f"{hours}h {minutes}m",
+            "network_connected": network_connected,
+            "internet_connected": internet_connected,
+        }
+        return json.dumps(status, ensure_ascii=False)
+    except Exception as e:
+        return json.dumps({"error": f"System status error: {e}"}, ensure_ascii=False)
+
+
 def get_random_joke(jokes_db):
     """Return a random joke as a JSON string."""
     return json.dumps(random.choice(jokes_db), ensure_ascii=False)
@@ -236,6 +394,10 @@ def execute_tool(name, args, jokes_db):
     """Dispatch a tool call and return the result as a string."""
     if name == "get_random_joke":
         return get_random_joke(jokes_db)
+    if name == "get_weather_forecast":
+        return get_weather_forecast()
+    if name == "get_system_status":
+        return get_system_status()
     return json.dumps({"error": f"Unknown tool: {name}"})
 
 
@@ -311,7 +473,7 @@ def stream_and_speak(messages, tools=None):
 
     Returns ``(full_response_text, tool_calls_or_None)``.
     """
-    cue = "Analysiere..." if CONFIG["language"] == "de" else "Analysing..."
+    cue = "Moment..." if CONFIG["language"] == "de" else "Analysing..."
     speak(cue)
 
     buffer = ""
@@ -369,6 +531,12 @@ def stream_and_speak(messages, tools=None):
 def chat_with_ollama(user_text, conversation_history, jokes_db):
     """Send user message to ollama, handle tool calls, stream and speak."""
     system_prompt = SYSTEM_PROMPT_DE if CONFIG["language"] == "de" else SYSTEM_PROMPT_EN
+    now = datetime.now()
+    if CONFIG["language"] == "de":
+        days = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]
+        system_prompt += f"\n\nAktuelles Datum und Uhrzeit: {now:%Y-%m-%d %H:%M} {days[now.weekday()]}"
+    else:
+        system_prompt += f"\n\nCurrent date and time: {now:%Y-%m-%d %H:%M %A}"
 
     messages = [{"role": "system", "content": system_prompt}]
     messages.extend(conversation_history)

@@ -3,3 +3,4 @@ pywhispercpp
 sounddevice
 numpy
 requests
+psutil

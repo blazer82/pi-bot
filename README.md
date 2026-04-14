@@ -38,20 +38,20 @@ Say **"Hey Jarvis"** to activate, then speak your question. Pi-Bot responds via 
 
 Edit the `CONFIG` dict at the top of `pi_bot.py`:
 
-| Key | Default | Description |
-|-----|---------|-------------|
-| `language` | `"de"` | `"de"` for German, `"en"` for English |
-| `ollama_model` | `"gemma4:e2b-it-q4_K_M"` | Ollama model tag |
-| `whisper_model` | `"small"` | Whisper model size (tiny/base/small/medium) |
-| `wake_word` | `"hey_jarvis"` | openWakeWord model name |
-| `wake_threshold` | `0.5` | Wake word confidence threshold (0.0-1.0) |
-| `silence_threshold` | `500` | RMS energy below this = silence |
-| `silence_duration` | `1.5` | Seconds of silence before stopping recording |
-| `max_record_seconds` | `15` | Maximum recording length |
-| `espeak_speed` | `130` | Speech rate (words per minute) |
-| `espeak_pitch` | `40` | Pitch (0-99, lower = deeper) |
-| `mic_device` | `None` | Microphone device index (None = default) |
-| `speaker_device` | `None` | Speaker device index (None = default) |
+| Key                  | Default                  | Description                                  |
+| -------------------- | ------------------------ | -------------------------------------------- |
+| `language`           | `"de"`                   | `"de"` for German, `"en"` for English        |
+| `ollama_model`       | `"gemma4:e2b-it-q4_K_M"` | Ollama model tag                             |
+| `whisper_model`      | `"small"`                | Whisper model size (tiny/base/small/medium)  |
+| `wake_word`          | `"hey_jarvis"`           | openWakeWord model name                      |
+| `wake_threshold`     | `0.5`                    | Wake word confidence threshold (0.0-1.0)     |
+| `silence_threshold`  | `500`                    | RMS energy below this = silence              |
+| `silence_duration`   | `1.5`                    | Seconds of silence before stopping recording |
+| `max_record_seconds` | `15`                     | Maximum recording length                     |
+| `espeak_speed`       | `130`                    | Speech rate (words per minute)               |
+| `espeak_pitch`       | `40`                     | Pitch (0-99, lower = deeper)                 |
+| `mic_device`         | `None`                   | Microphone device index (None = default)     |
+| `speaker_device`     | `None`                   | Speaker device index (None = default)        |
 
 ## Audio Device Troubleshooting
 
@@ -99,9 +99,9 @@ Categories: `Informatiker`, `Tier`, `Schule`, `Allgemein`, `Wortspiel` (or add y
 
 ## Stack
 
-| Component | Purpose |
-|-----------|---------|
-| [openWakeWord](https://github.com/dscripka/openWakeWord) | Wake word detection |
-| [whisper.cpp](https://github.com/ggerganov/whisper.cpp) / pywhispercpp | Speech-to-text |
-| [ollama](https://ollama.com/) + Gemma 4 | LLM inference with tool calling |
-| [espeak-ng](https://github.com/espeak-ng/espeak-ng) | Text-to-speech (robotic voice) |
+| Component                                                              | Purpose                         |
+| ---------------------------------------------------------------------- | ------------------------------- |
+| [openWakeWord](https://github.com/dscripka/openWakeWord)               | Wake word detection             |
+| [whisper.cpp](https://github.com/ggerganov/whisper.cpp) / pywhispercpp | Speech-to-text                  |
+| [ollama](https://ollama.com/) + Gemma 4                                | LLM inference with tool calling |
+| [espeak-ng](https://github.com/espeak-ng/espeak-ng)                    | Text-to-speech (robotic voice)  |

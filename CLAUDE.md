@@ -17,13 +17,14 @@ source venv/bin/activate
 
 # Run the bot
 python3 pi_bot.py
+python3 -m pi_bot          # alternative
 
 # Run all tests
-python3 -m pytest test_pi_bot.py -v
+python3 -m pytest tests/ -v
 
-# Run a single test class or method
-python3 -m pytest test_pi_bot.py::TestTranscribe -v
-python3 -m pytest test_pi_bot.py::TestTranscribe::test_basic_transcription -v
+# Run a single test file or class
+python3 -m pytest tests/test_tools.py -v
+python3 -m pytest tests/test_chat.py::TestChatWithOllama -v
 
 # Install dev dependencies
 pip install -r requirements-dev.txt
@@ -31,7 +32,20 @@ pip install -r requirements-dev.txt
 
 ## Architecture
 
-This is a single-file Python application (`pi_bot.py`) with no framework overhead.
+The application is structured as the `pi_bot/` package with focused modules:
+
+```
+pi_bot/
+  config.py   — CONFIG dict, system prompts (DE/EN), TOOLS definitions
+  tts.py      — speak() via espeak-ng
+  stt.py      — transcribe() via whisper.cpp
+  audio.py    — listen_for_wake_word(), record_until_silence(), wait_for_followup()
+  tools.py    — tool implementations (weather, system status, jokes) + execute_tool() dispatcher
+  chat.py     — Ollama streaming, sentence-by-sentence speech, chat_with_ollama() orchestration
+  main.py     — main loop, chat_mode(), CLI entry point
+```
+
+The root `pi_bot.py` is a thin shim that calls `pi_bot.main.cli()`.
 
 **Pipeline:** Mic -> Wake word detection -> Record until silence -> Whisper STT -> Ollama chat (streaming) -> Tool execution loop (up to 3 rounds) -> espeak-ng TTS -> Speaker
 
@@ -45,12 +59,12 @@ This is a single-file Python application (`pi_bot.py`) with no framework overhea
    - Tool calls are executed via `execute_tool()` and results fed back for up to 3 rounds
 5. `wait_for_followup()` listens for a follow-up utterance (two-phase: detect speech onset, then record until silence)
 
-**Configuration:** All tunables live in the `CONFIG` dict at the top of `pi_bot.py` (language, model, thresholds, audio devices, TTS parameters). System prompts are defined separately for German (`SYSTEM_PROMPT_DE`) and English (`SYSTEM_PROMPT_EN`).
+**Configuration:** All tunables live in `CONFIG` in `pi_bot/config.py` (language, model, thresholds, audio devices, TTS parameters). System prompts are defined separately for German (`SYSTEM_PROMPT_DE`) and English (`SYSTEM_PROMPT_EN`).
 
-**Conversation context:** Rolling history capped at `context_window * 2` messages (default 12 = 6 turns), reset on each new wake-word activation.
+**Conversation context:** Rolling history capped at `context_turns * 2` messages (default 50), reset on each new wake-word activation.
 
 ## Testing
 
-All hardware and external dependencies (sounddevice, openwakeword, pywhispercpp, espeak-ng, Ollama API) are mocked at the module level in `test_pi_bot.py` before `pi_bot` is imported. Tests run without any physical hardware or services.
+Tests live in `tests/` and mirror the package structure. Hardware dependencies (sounddevice, openwakeword, pywhispercpp) are mocked in `tests/conftest.py` before any `pi_bot` code is imported.
 
-**Adding tools:** Add tool definition to `TOOLS` list (Ollama JSON schema format), write the function, add dispatch in `execute_tool()`, and mention the tool in the system prompt.
+**Adding tools:** Add the tool schema to `TOOLS` in `pi_bot/config.py`, implement the function and add dispatch in `pi_bot/tools.py`, mention the tool in the system prompt, and add tests in `tests/test_tools.py`.

@@ -1,0 +1,142 @@
+[
+  {
+    "id": 1,
+    "category": "Informatiker",
+    "keywords": ["computer", "programmieren", "bug", "programmierer"],
+    "setup": "Warum benutzen Programmierer dunklen Modus?",
+    "punchline": "Weil Licht Bugs anzieht."
+  },
+  {
+    "id": 2,
+    "category": "Informatiker",
+    "keywords": ["computer", "internet", "wlan", "wifi"],
+    "setup": "Was sagt ein IT-Techniker, wenn er in den Urlaub faehrt?",
+    "punchline": "Ich bin mal offline."
+  },
+  {
+    "id": 3,
+    "category": "Informatiker",
+    "keywords": ["java", "programmieren", "kaffee"],
+    "setup": "Warum trinken Java-Entwickler keinen Kaffee?",
+    "punchline": "Weil sie schon genug Probleme mit Exceptions haben."
+  },
+  {
+    "id": 4,
+    "category": "Informatiker",
+    "keywords": ["sql", "datenbank", "bar"],
+    "setup": "Ein SQL-Query geht in eine Bar, sieht zwei Tische und fragt:",
+    "punchline": "Kann ich euch joinen?"
+  },
+  {
+    "id": 5,
+    "category": "Informatiker",
+    "keywords": ["git", "programmieren", "commit"],
+    "setup": "Warum hat der Programmierer seinen Job verloren?",
+    "punchline": "Er konnte sich nicht committen."
+  },
+  {
+    "id": 6,
+    "category": "Tier",
+    "keywords": ["hund", "katze", "tier", "haustier"],
+    "setup": "Was macht ein Hund im Flugzeug?",
+    "punchline": "Er gibt Pfotgas."
+  },
+  {
+    "id": 7,
+    "category": "Tier",
+    "keywords": ["fisch", "meer", "wasser"],
+    "setup": "Was sagt ein Fisch, wenn er gegen eine Wand schwimmt?",
+    "punchline": "Damm!"
+  },
+  {
+    "id": 8,
+    "category": "Tier",
+    "keywords": ["kuh", "bauernhof", "milch"],
+    "setup": "Was sagt die Kuh zum Bauern?",
+    "punchline": "Muht mir leid."
+  },
+  {
+    "id": 9,
+    "category": "Schule",
+    "keywords": ["lehrer", "schueler", "mathe", "mathematik"],
+    "setup": "Lehrer: Was ist die Haelfte von acht?",
+    "punchline": "Schueler: Kommt drauf an. Oben oder unten? Oben ist es null, unten ist es drei."
+  },
+  {
+    "id": 10,
+    "category": "Schule",
+    "keywords": ["lehrer", "schueler", "deutsch", "grammatik"],
+    "setup": "Lehrer: Nenne mir fuenf Tiere aus Afrika.",
+    "punchline": "Schueler: Zwei Loewen und drei Elefanten."
+  },
+  {
+    "id": 11,
+    "category": "Allgemein",
+    "keywords": ["arzt", "doktor", "gesundheit"],
+    "setup": "Patient: Herr Doktor, ich habe jeden Morgen um sieben Durchfall!",
+    "punchline": "Doktor: Das ist doch ein sehr geregelter Stuhlgang. Patient: Ja, aber ich stehe erst um acht auf!"
+  },
+  {
+    "id": 12,
+    "category": "Allgemein",
+    "keywords": ["polizei", "auto", "verkehr"],
+    "setup": "Polizist: Sie sind zu schnell gefahren!",
+    "punchline": "Fahrer: Das kann nicht sein, ich bin doch erst vor fuenf Minuten losgefahren!"
+  },
+  {
+    "id": 13,
+    "category": "Wortspiel",
+    "keywords": ["brot", "essen", "baecker"],
+    "setup": "Was liegt am Strand und spricht undeutlich?",
+    "punchline": "Eine Nuschel."
+  },
+  {
+    "id": 14,
+    "category": "Wortspiel",
+    "keywords": ["musik", "instrument", "klavier"],
+    "setup": "Was ist braun, klebrig und laeuft durch die Wueste?",
+    "punchline": "Ein Karamel."
+  },
+  {
+    "id": 15,
+    "category": "Wortspiel",
+    "keywords": ["obst", "frucht", "essen"],
+    "setup": "Was ist orange und wandert durch die Berge?",
+    "punchline": "Eine Wanderine."
+  },
+  {
+    "id": 16,
+    "category": "Wortspiel",
+    "keywords": ["geld", "bank", "reich"],
+    "setup": "Was macht ein Pirat am Computer?",
+    "punchline": "Er drueckt die Enter-Taste."
+  },
+  {
+    "id": 17,
+    "category": "Allgemein",
+    "keywords": ["telefon", "anruf"],
+    "setup": "Klingelt das Telefon im Buero. Meldet sich einer: Hier Meier. Sagt der Anrufer:",
+    "punchline": "Hier auch!"
+  },
+  {
+    "id": 18,
+    "category": "Informatiker",
+    "keywords": ["passwort", "sicherheit", "hacker"],
+    "setup": "Mein Passwort ist seit drei Jahren das gleiche.",
+    "punchline": "Mein Hund wird auch nicht juenger."
+  },
+  {
+    "id": 19,
+    "category": "Tier",
+    "keywords": ["schnecke", "langsam"],
+    "setup": "Was macht eine Schnecke auf einem Schildkroetenpanzer?",
+    "punchline": "Wheee!"
+  },
+  {
+    "id": 20,
+    "category": "Allgemein",
+    "keywords": ["roboter", "ki", "kuenstliche intelligenz", "raspberry"],
+    "setup": "Warum sind Roboter nie einsam?",
+    "punchline": "Weil sie immer gut vernetzt sind."
+  }
+]

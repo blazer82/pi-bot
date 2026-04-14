@@ -1,0 +1,5 @@
+openwakeword
+pywhispercpp
+sounddevice
+numpy
+requests

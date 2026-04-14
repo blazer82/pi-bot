@@ -1,142 +1,842 @@
 [
   {
     "id": 1,
-    "category": "Informatiker",
-    "keywords": ["computer", "programmieren", "bug", "programmierer"],
+    "category": "Wortspiel",
+    "keywords": ["programmierer", "computer", "bug", "licht"],
     "setup": "Warum benutzen Programmierer dunklen Modus?",
     "punchline": "Weil Licht Bugs anzieht."
   },
   {
     "id": 2,
-    "category": "Informatiker",
-    "keywords": ["computer", "internet", "wlan", "wifi"],
-    "setup": "Was sagt ein IT-Techniker, wenn er in den Urlaub faehrt?",
-    "punchline": "Ich bin mal offline."
-  },
-  {
-    "id": 3,
-    "category": "Informatiker",
-    "keywords": ["java", "programmieren", "kaffee"],
-    "setup": "Warum trinken Java-Entwickler keinen Kaffee?",
-    "punchline": "Weil sie schon genug Probleme mit Exceptions haben."
-  },
-  {
-    "id": 4,
-    "category": "Informatiker",
+    "category": "Wortspiel",
     "keywords": ["sql", "datenbank", "bar"],
     "setup": "Ein SQL-Query geht in eine Bar, sieht zwei Tische und fragt:",
     "punchline": "Kann ich euch joinen?"
   },
   {
-    "id": 5,
-    "category": "Informatiker",
-    "keywords": ["git", "programmieren", "commit"],
+    "id": 3,
+    "category": "Wortspiel",
+    "keywords": ["git", "programmieren", "arbeit"],
     "setup": "Warum hat der Programmierer seinen Job verloren?",
     "punchline": "Er konnte sich nicht committen."
   },
   {
+    "id": 4,
+    "category": "Wortspiel",
+    "keywords": ["hund", "tier", "musik", "bass"],
+    "setup": "Dein Hund bellt aber tief!",
+    "punchline": "Ja, ist ein Subwuffer."
+  },
+  {
+    "id": 5,
+    "category": "Wortspiel",
+    "keywords": ["bodybuilder", "sport", "hantel"],
+    "setup": "Warum fackeln Bodybuilder nie lange?",
+    "punchline": "Die hanteln."
+  },
+  {
     "id": 6,
-    "category": "Tier",
-    "keywords": ["hund", "katze", "tier", "haustier"],
-    "setup": "Was macht ein Hund im Flugzeug?",
-    "punchline": "Er gibt Pfotgas."
+    "category": "Wortspiel",
+    "keywords": ["pirat", "weinen", "rum", "alkohol"],
+    "setup": "Warum weinen echte Piraten nicht?",
+    "punchline": "Echte Piraten heulen Rum."
   },
   {
     "id": 7,
-    "category": "Tier",
-    "keywords": ["fisch", "meer", "wasser"],
-    "setup": "Was sagt ein Fisch, wenn er gegen eine Wand schwimmt?",
-    "punchline": "Damm!"
+    "category": "Wortspiel",
+    "keywords": ["ddr", "grenze", "stimmung", "geschichte"],
+    "setup": "Wie war die Stimmung in der DDR?",
+    "punchline": "Hielt sich in Grenzen."
   },
   {
     "id": 8,
-    "category": "Tier",
-    "keywords": ["kuh", "bauernhof", "milch"],
-    "setup": "Was sagt die Kuh zum Bauern?",
-    "punchline": "Muht mir leid."
+    "category": "Wortspiel",
+    "keywords": ["bizeps", "arm", "angeben", "sport"],
+    "setup": "Was ist es, mit einem trainierten Bizeps anzugeben?",
+    "punchline": "Oberarm."
   },
   {
     "id": 9,
-    "category": "Schule",
-    "keywords": ["lehrer", "schueler", "mathe", "mathematik"],
-    "setup": "Lehrer: Was ist die Haelfte von acht?",
-    "punchline": "Schueler: Kommt drauf an. Oben oder unten? Oben ist es null, unten ist es drei."
+    "category": "Wortspiel",
+    "keywords": ["schluessel", "haus", "aussperren"],
+    "setup": "Ich hab mich ausgesperrt!",
+    "punchline": "Ich war voellig aus dem Haeuschen."
   },
   {
     "id": 10,
-    "category": "Schule",
-    "keywords": ["lehrer", "schueler", "deutsch", "grammatik"],
-    "setup": "Lehrer: Nenne mir fuenf Tiere aus Afrika.",
-    "punchline": "Schueler: Zwei Loewen und drei Elefanten."
+    "category": "Wortspiel",
+    "keywords": ["albert", "einstein", "schlafen"],
+    "setup": "Egal, wie gut du schlaefst:",
+    "punchline": "Albert schlaeft wie Einstein."
   },
   {
     "id": 11,
-    "category": "Allgemein",
-    "keywords": ["arzt", "doktor", "gesundheit"],
-    "setup": "Patient: Herr Doktor, ich habe jeden Morgen um sieben Durchfall!",
-    "punchline": "Doktor: Das ist doch ein sehr geregelter Stuhlgang. Patient: Ja, aber ich stehe erst um acht auf!"
+    "category": "Wortspiel",
+    "keywords": ["toepfern", "kurs", "ton"],
+    "setup": "Ich bin aus dem Toepferkurs geflogen.",
+    "punchline": "Ich hatte mich im Ton vergriffen."
   },
   {
     "id": 12,
-    "category": "Allgemein",
-    "keywords": ["polizei", "auto", "verkehr"],
-    "setup": "Polizist: Sie sind zu schnell gefahren!",
-    "punchline": "Fahrer: Das kann nicht sein, ich bin doch erst vor fuenf Minuten losgefahren!"
+    "category": "Wortspiel",
+    "keywords": ["clown", "beziehung", "lustig"],
+    "setup": "Ich habe meine Beziehung mit einem Clown beendet.",
+    "punchline": "Jetzt ist Schluss mit lustig."
   },
   {
     "id": 13,
     "category": "Wortspiel",
-    "keywords": ["brot", "essen", "baecker"],
-    "setup": "Was liegt am Strand und spricht undeutlich?",
-    "punchline": "Eine Nuschel."
+    "keywords": ["magnet", "anziehen", "kleidung"],
+    "setup": "Treffen sich zwei Magnete. Sagt der eine:",
+    "punchline": "Was soll ich heute anziehen?"
   },
   {
     "id": 14,
     "category": "Wortspiel",
-    "keywords": ["musik", "instrument", "klavier"],
-    "setup": "Was ist braun, klebrig und laeuft durch die Wueste?",
-    "punchline": "Ein Karamel."
+    "keywords": ["bumerang", "stock", "zurueck"],
+    "setup": "Wie nennt man einen Bumerang, der nicht zurueckkommt?",
+    "punchline": "Stock."
   },
   {
     "id": 15,
     "category": "Wortspiel",
-    "keywords": ["obst", "frucht", "essen"],
-    "setup": "Was ist orange und wandert durch die Berge?",
-    "punchline": "Eine Wanderine."
+    "keywords": ["bahn", "zug", "witz"],
+    "setup": "Ich kenne noch einen Bahnwitz,",
+    "punchline": "aber ich weiss nicht, ob der ankommt."
   },
   {
     "id": 16,
     "category": "Wortspiel",
-    "keywords": ["geld", "bank", "reich"],
-    "setup": "Was macht ein Pirat am Computer?",
-    "punchline": "Er drueckt die Enter-Taste."
+    "keywords": ["schauspieler", "arbeitslos", "rolle"],
+    "setup": "Was macht ein arbeitsloser Schauspieler?",
+    "punchline": "Spielt keine Rolle."
   },
   {
     "id": 17,
-    "category": "Allgemein",
-    "keywords": ["telefon", "anruf"],
-    "setup": "Klingelt das Telefon im Buero. Meldet sich einer: Hier Meier. Sagt der Anrufer:",
-    "punchline": "Hier auch!"
+    "category": "Wortspiel",
+    "keywords": ["kellner", "zahlen", "restaurant"],
+    "setup": "Gast zum Kellner: Zahlen, bitte!",
+    "punchline": "Kellner: Acht, sieben, sechs, fuenf..."
   },
   {
     "id": 18,
-    "category": "Informatiker",
-    "keywords": ["passwort", "sicherheit", "hacker"],
-    "setup": "Mein Passwort ist seit drei Jahren das gleiche.",
-    "punchline": "Mein Hund wird auch nicht juenger."
+    "category": "Wortspiel",
+    "keywords": ["mutter", "klein", "minimum"],
+    "setup": "Wie nennt man eine kleine Mutter?",
+    "punchline": "Eine Minimum."
   },
   {
     "id": 19,
+    "category": "Wortspiel",
+    "keywords": ["bad", "nehmen", "fehlen"],
+    "setup": "Hast du ein Bad genommen?",
+    "punchline": "Warum, fehlt eins?"
+  },
+  {
+    "id": 20,
+    "category": "Wortspiel",
+    "keywords": ["griechenland", "gott", "zeug", "unordnung"],
+    "setup": "Wie heisst der griechische Gott des herumliegenden Krempels?",
+    "punchline": "Zeuchs."
+  },
+  {
+    "id": 21,
+    "category": "Wortspiel",
+    "keywords": ["tarnhose", "unsichtbar", "kleidung"],
+    "setup": "Habe mir gestern eine Tarnhose gekauft.",
+    "punchline": "Kann sie nicht mehr finden!"
+  },
+  {
+    "id": 22,
+    "category": "Wortspiel",
+    "keywords": ["genitiv", "dativ", "grammatik", "wasser"],
+    "setup": "Warum springt der Genitiv ins Wasser?",
+    "punchline": "Weil es Dativ ist."
+  },
+  {
+    "id": 23,
+    "category": "Wortspiel",
+    "keywords": ["spanier", "auto", "carlos"],
+    "setup": "Wie heisst ein Spanier ohne Auto?",
+    "punchline": "Carlos."
+  },
+  {
+    "id": 24,
+    "category": "Wortspiel",
+    "keywords": ["origami", "lehrer", "knicken"],
+    "setup": "Was sagt ein Origami-Lehrer zu seinem Schueler?",
+    "punchline": "Das kannste knicken."
+  },
+  {
+    "id": 25,
+    "category": "Wortspiel",
+    "keywords": ["cola", "bier", "trinken", "kollabieren"],
+    "setup": "Was passiert, wenn man Cola und Bier gleichzeitig trinkt?",
+    "punchline": "Man colabiert."
+  },
+  {
+    "id": 26,
+    "category": "Wortspiel",
+    "keywords": ["gen", "chemie", "halogen"],
+    "setup": "Was sagt ein Gen, wenn es ein anderes Gen trifft?",
+    "punchline": "Halogen!"
+  },
+  {
+    "id": 27,
+    "category": "Wortspiel",
+    "keywords": ["bauer", "studium", "universitaet"],
+    "setup": "Wie nennt man einen Bauern mit Uni-Abschluss?",
+    "punchline": "Einen Ackerdemiker."
+  },
+  {
+    "id": 28,
+    "category": "Wortspiel",
+    "keywords": ["gemuese", "schlau", "aubergine"],
+    "setup": "Wie heisst das intelligenteste Gemuese?",
+    "punchline": "Schlaubergine."
+  },
+  {
+    "id": 29,
+    "category": "Wortspiel",
+    "keywords": ["japan", "krieger", "samurai", "ninja"],
+    "setup": "Ich bin so unentschlossen.",
+    "punchline": "Als japanischer Krieger waere ich ein Nunja."
+  },
+  {
+    "id": 30,
+    "category": "Wortspiel",
+    "keywords": ["banane", "gelb", "waffe"],
+    "setup": "Was ist gelb und schiesst?",
+    "punchline": "Eine Banone!"
+  },
+  {
+    "id": 31,
+    "category": "Wortspiel",
+    "keywords": ["auto", "scherzedes", "mercedes"],
+    "setup": "Welches ist die lustigste Automarke?",
+    "punchline": "Scherzedes."
+  },
+  {
+    "id": 32,
+    "category": "Wortspiel",
+    "keywords": ["pirat", "essen", "kapern"],
+    "setup": "Was ist die Lieblingsspeise von Piraten?",
+    "punchline": "Kapern."
+  },
+  {
+    "id": 33,
+    "category": "Wortspiel",
+    "keywords": ["telefon", "elefant", "gross"],
+    "setup": "Was ist gross, grau und kann telefonieren?",
+    "punchline": "Ein Telefant."
+  },
+  {
+    "id": 34,
+    "category": "Wortspiel",
+    "keywords": ["pirat", "seeraeuber", "kreis", "pi", "mathe"],
+    "setup": "Wieso koennen Seeraeuber keinen Kreis fahren?",
+    "punchline": "Weil sie Pi raten."
+  },
+  {
+    "id": 35,
+    "category": "Wortspiel",
+    "keywords": ["keks", "baum", "schatten", "plaetzchen"],
+    "setup": "Was ist ein Keks unter einem Baum?",
+    "punchline": "Ein schattiges Plaetzchen."
+  },
+  {
+    "id": 36,
+    "category": "Wortspiel",
+    "keywords": ["stift", "wachsen", "malen"],
+    "setup": "Was sagt der grosse Stift zum kleinen Stift?",
+    "punchline": "Wachsmalstift!"
+  },
+  {
+    "id": 37,
+    "category": "Wortspiel",
+    "keywords": ["biene", "summen", "singen", "text"],
+    "setup": "Warum summen Bienen?",
+    "punchline": "Weil sie den Text nicht kennen!"
+  },
+  {
+    "id": 38,
+    "category": "Wortspiel",
+    "keywords": ["rind", "oxford", "verschwunden"],
+    "setup": "Wie nennt man ein verschwundenes Rindtier?",
+    "punchline": "Oxford."
+  },
+  {
+    "id": 39,
+    "category": "Wortspiel",
+    "keywords": ["iglu", "flur", "eis", "diele"],
+    "setup": "Wie nennt man den Flur eines Iglus?",
+    "punchline": "Eisdiele!"
+  },
+  {
+    "id": 40,
+    "category": "Wortspiel",
+    "keywords": ["fee", "schokolade", "fliegen", "zaehne"],
+    "setup": "Was ist braun, kann fliegen und macht Kindern die Zaehne kaputt?",
+    "punchline": "Die Toffi-Fee!"
+  },
+  {
+    "id": 41,
+    "category": "Wortspiel",
+    "keywords": ["schriftsteller", "dick", "kugelschreiber"],
+    "setup": "Wie nennt man einen dicken Schriftsteller?",
+    "punchline": "Kugelschreiber!"
+  },
+  {
+    "id": 42,
+    "category": "Wortspiel",
+    "keywords": ["milch", "fallen", "haltbar"],
+    "setup": "Hab die Milch fallen lassen.",
+    "punchline": "War nicht mehr haltbar!"
+  },
+  {
+    "id": 43,
+    "category": "Wortspiel",
+    "keywords": ["broetchen", "telefon", "anrufen", "belegt"],
+    "setup": "Ich habe heute ein Broetchen angerufen.",
+    "punchline": "Aber es war belegt."
+  },
+  {
+    "id": 44,
+    "category": "Wortspiel",
+    "keywords": ["eichhoernchen", "sparen", "nuss", "geld"],
+    "setup": "Wovon leben Eichhoernchen?",
+    "punchline": "Von ihren Ersparnuessen!"
+  },
+  {
+    "id": 45,
+    "category": "Wortspiel",
+    "keywords": ["wolf", "werwolf", "bruder"],
+    "setup": "Wie heisst der Bruder vom Werwolf?",
+    "punchline": "Warumwolf."
+  },
+  {
+    "id": 46,
+    "category": "Wortspiel",
+    "keywords": ["schneeflocke", "fliegen", "verwirrt"],
+    "setup": "Was ist weiss und fliegt nach oben?",
+    "punchline": "Eine verwirrte Schneeflocke!"
+  },
+  {
+    "id": 47,
+    "category": "Wortspiel",
+    "keywords": ["biene", "rueckwaerts", "mus"],
+    "setup": "Was ist schwarz-gelb und macht Mus Mus?",
+    "punchline": "Eine Biene im Rueckwaertsgang!"
+  },
+  {
+    "id": 48,
+    "category": "Wortspiel",
+    "keywords": ["baum", "russland", "russisch"],
+    "setup": "Wie heisst ein Baum auf Russisch?",
+    "punchline": "Dimitree."
+  },
+  {
+    "id": 49,
+    "category": "Wortspiel",
+    "keywords": ["reh", "kartoffel", "pueree"],
+    "setup": "Wie lautet der Vorname vom Reh?",
+    "punchline": "Kartoffelpue."
+  },
+  {
+    "id": 50,
+    "category": "Wortspiel",
+    "keywords": ["hund", "essen", "kartoffel", "restaurant"],
+    "setup": "Was essen Hunde im Restaurant?",
+    "punchline": "Bell-Kartoffeln."
+  },
+  {
+    "id": 51,
+    "category": "Wortspiel",
+    "keywords": ["keks", "boerse", "geld", "spekulatius"],
+    "setup": "Wie heisst der Keks an der Boerse?",
+    "punchline": "Spekulatius."
+  },
+  {
+    "id": 52,
+    "category": "Wortspiel",
+    "keywords": ["spiderman", "netz", "telefon"],
+    "setup": "Ich wollte Spiderman anrufen.",
+    "punchline": "Aber er hatte kein Netz."
+  },
+  {
+    "id": 53,
+    "category": "Wortspiel",
+    "keywords": ["dach", "haus", "kaufen"],
+    "setup": "Hab mir gestern ein neues Dach gekauft.",
+    "punchline": "Ging aufs Haus!"
+  },
+  {
+    "id": 54,
+    "category": "Wortspiel",
+    "keywords": ["clown", "buero", "fax"],
+    "setup": "Was macht ein Clown im Buero?",
+    "punchline": "Faxen!"
+  },
+  {
+    "id": 55,
+    "category": "Wortspiel",
+    "keywords": ["katze", "haus", "wohnen", "mieze"],
+    "setup": "Wo wohnen Katzen?",
+    "punchline": "Im Miezhaus."
+  },
+  {
+    "id": 56,
+    "category": "Wortspiel",
+    "keywords": ["schneemann", "sommer", "pfuetze"],
+    "setup": "Wie nennt man einen Schneemann im Sommer?",
+    "punchline": "Eine Pfuetze."
+  },
+  {
+    "id": 57,
+    "category": "Wortspiel",
+    "keywords": ["schuhe", "journalist", "skandal"],
+    "setup": "Welche Schuhe tragen Journalisten?",
+    "punchline": "Skandalen."
+  },
+  {
+    "id": 58,
+    "category": "Wortspiel",
+    "keywords": ["drucker", "tanzen", "verfuehren"],
+    "setup": "Wie verfuehrt man einen Drucker?",
+    "punchline": "Mit Ausdruckstanz!"
+  },
+  {
+    "id": 59,
+    "category": "Wortspiel",
+    "keywords": ["bruce lee", "vegan", "brokkoli"],
+    "setup": "Wie heisst der vegane Bruder von Bruce Lee?",
+    "punchline": "Brocco Lee."
+  },
+  {
+    "id": 60,
+    "category": "Wortspiel",
+    "keywords": ["kuh", "museum", "schule", "ausflug"],
+    "setup": "Was machen Kuehe beim Schulausflug?",
+    "punchline": "Sie gehen ins Muuuseum!"
+  },
+  {
+    "id": 61,
+    "category": "Wortspiel",
+    "keywords": ["pinguin", "schwarz", "weiss", "schaukel"],
+    "setup": "Was ist schwarz-weiss und sitzt auf der Schaukel?",
+    "punchline": "Ein Schwinguin!"
+  },
+  {
+    "id": 62,
+    "category": "Wortspiel",
+    "keywords": ["baer", "fliegen", "hubschrauber"],
+    "setup": "Wie heisst ein Baer, der fliegen kann?",
+    "punchline": "Hubschrau-Baer."
+  },
+  {
+    "id": 63,
+    "category": "Wortspiel",
+    "keywords": ["pinocchio", "arzt", "holz", "nase"],
+    "setup": "Welchen Arzt braucht Pinocchio?",
+    "punchline": "Den Holz-Nasen-Ohren-Arzt."
+  },
+  {
+    "id": 64,
+    "category": "Wortspiel",
+    "keywords": ["gurke", "salat", "gruen", "schweigen"],
+    "setup": "Was ist gruen und fluestert im Gurkensalat?",
+    "punchline": "Dill Schweiger."
+  },
+  {
+    "id": 65,
+    "category": "Wortspiel",
+    "keywords": ["zebra", "rot", "sonnenbrand"],
+    "setup": "Was ist schwarz, weiss und rot?",
+    "punchline": "Ein Zebra mit Sonnenbrand!"
+  },
+  {
+    "id": 66,
+    "category": "Wortspiel",
+    "keywords": ["biene", "maja", "turbine", "drehen"],
+    "setup": "Was ist schwarz-gelb und dreht sich im Kreis?",
+    "punchline": "Turbine Maja."
+  },
+  {
+    "id": 67,
+    "category": "Wortspiel",
+    "keywords": ["kaffee", "kaputt", "maschine"],
+    "setup": "Was kommt aus einer defekten Kaffeemaschine?",
+    "punchline": "Ein Kaputtcino."
+  },
+  {
+    "id": 68,
+    "category": "Wortspiel",
+    "keywords": ["bahn", "zug", "witz"],
+    "setup": "Welche Witze kommen nie an?",
+    "punchline": "Die ueber die Deutsche Bahn!"
+  },
+  {
+    "id": 69,
+    "category": "Wortspiel",
+    "keywords": ["sauna", "sprache", "schweiz"],
+    "setup": "Welche Sprache wird in der Sauna gesprochen?",
+    "punchline": "Schwitzerdeutsch!"
+  },
+  {
+    "id": 70,
+    "category": "Wortspiel",
+    "keywords": ["bacardi", "rum", "regal", "alkohol"],
+    "setup": "Was macht Bacardi im Regal?",
+    "punchline": "Rum stehen."
+  },
+  {
+    "id": 71,
+    "category": "Wortspiel",
+    "keywords": ["maus", "kater", "alkohol"],
+    "setup": "Warum trinken Maeuse keinen Alkohol?",
+    "punchline": "Sie haben Angst vor dem Kater!"
+  },
+  {
+    "id": 72,
+    "category": "Wortspiel",
+    "keywords": ["pilz", "pizza", "belag"],
+    "setup": "Was machen Pilze auf Pizza?",
+    "punchline": "Sie fungieren als Belag."
+  },
+  {
+    "id": 73,
+    "category": "Wortspiel",
+    "keywords": ["reformhaus", "reh", "haus"],
+    "setup": "Was ist das Gegenteil von Reformhaus?",
+    "punchline": "Reh hinterm Haus."
+  },
+  {
+    "id": 74,
+    "category": "Wortspiel",
+    "keywords": ["mathe", "garten", "wurzel"],
+    "setup": "Was machen Mathematiker im Garten?",
+    "punchline": "Wurzeln ziehen."
+  },
+  {
+    "id": 75,
+    "category": "Wortspiel",
+    "keywords": ["chef", "trinken", "wasser", "leitung"],
+    "setup": "Was trinken Fuehrungskraefte?",
+    "punchline": "Leitungswasser!"
+  },
+  {
+    "id": 76,
+    "category": "Wortspiel",
+    "keywords": ["elvis", "bruder", "zwoelf"],
+    "setup": "Wie heisst der Bruder von Elvis?",
+    "punchline": "Zwoelvis."
+  },
+  {
+    "id": 77,
+    "category": "Wortspiel",
+    "keywords": ["huhn", "ei", "werfen"],
+    "setup": "Warum legen Huehner Eier?",
+    "punchline": "Weil sie beim Werfen kaputtgehen wuerden."
+  },
+  {
+    "id": 78,
+    "category": "Wortspiel",
+    "keywords": ["billard", "gruen", "baum", "gefahr"],
+    "setup": "Was ist gruen und toetet dich, wenn es vom Baum faellt?",
+    "punchline": "Ein Billardtisch."
+  },
+  {
+    "id": 79,
+    "category": "Wortspiel",
+    "keywords": ["spinat", "gruen", "spion"],
+    "setup": "Was ist gruen und guckt durch das Schluesselloch?",
+    "punchline": "Ein Spionat!"
+  },
+  {
+    "id": 80,
+    "category": "Wortspiel",
+    "keywords": ["nudel", "pasta", "security", "fabrik"],
+    "setup": "Was macht die Security in der Nudelfabrik?",
+    "punchline": "Die Pasta auf."
+  },
+  {
+    "id": 81,
+    "category": "Wortspiel",
+    "keywords": ["erbse", "gruen", "sterben"],
+    "setup": "Was ist klein, gruen, rund und liegt im Sterben?",
+    "punchline": "Eine Sterbse."
+  },
+  {
+    "id": 82,
+    "category": "Wortspiel",
+    "keywords": ["null", "acht", "guertel", "zahl"],
+    "setup": "Was sagt die Null zur Acht?",
+    "punchline": "Schicker Guertel!"
+  },
+  {
+    "id": 83,
+    "category": "Wortspiel",
+    "keywords": ["kaninchen", "kamin", "qualm"],
+    "setup": "Was huepft ueber die Wiese und qualmt?",
+    "punchline": "Ein Kaminchen!"
+  },
+  {
+    "id": 84,
+    "category": "Wortspiel",
+    "keywords": ["gespenst", "budapest", "wohnen"],
+    "setup": "Wo leben die meisten Gespenster?",
+    "punchline": "In BUHdapest!"
+  },
+  {
+    "id": 85,
+    "category": "Wortspiel",
+    "keywords": ["hammer", "werkzeug", "idee"],
+    "setup": "Welches Werkzeug hat immer gute Ideen?",
+    "punchline": "Der Vorschlaghammer."
+  },
+  {
+    "id": 86,
+    "category": "Wortspiel",
+    "keywords": ["kastanie", "gefaengnis", "wald"],
+    "setup": "Was ist schwarz-weiss gestreift und rennt durch den Wald?",
+    "punchline": "Eine Knastanie!"
+  },
+  {
+    "id": 87,
+    "category": "Wortspiel",
+    "keywords": ["italien", "lamm", "auto", "lamborghini"],
+    "setup": "Wie heisst der Italiener, der sich ein Lamm leiht?",
+    "punchline": "Lamborghini!"
+  },
+  {
+    "id": 88,
+    "category": "Wortspiel",
+    "keywords": ["tarzan", "marzipan", "dschungel"],
+    "setup": "Was ist suess und schwingt sich durch den Dschungel?",
+    "punchline": "Tarzipan!"
+  },
+  {
+    "id": 89,
+    "category": "Wortspiel",
+    "keywords": ["brot", "gesund", "beleidigt", "schmollen"],
+    "setup": "Was ist gesund und beleidigt?",
+    "punchline": "Ein Schmollkornbrot."
+  },
+  {
+    "id": 90,
+    "category": "Wortspiel",
+    "keywords": ["bettlaken", "weiss", "spannen", "schluesselloch"],
+    "setup": "Was ist weiss und guckt durchs Schluesselloch?",
+    "punchline": "Ein Spannbettlaken."
+  },
+  {
+    "id": 91,
+    "category": "Wortspiel",
+    "keywords": ["auto", "essen", "parkplatz"],
+    "setup": "Was essen Autos am liebsten?",
+    "punchline": "Parkplaetzchen."
+  },
+  {
+    "id": 92,
+    "category": "Wortspiel",
+    "keywords": ["ananas", "gelb", "fenster", "spannen"],
+    "setup": "Was ist gelb und steht am Fenster?",
+    "punchline": "Eine Spannanas."
+  },
+  {
+    "id": 93,
+    "category": "Wortspiel",
+    "keywords": ["frosch", "milch", "laden"],
+    "setup": "Kommt ein Frosch in den Milchladen. Sagt der Frosch:",
+    "punchline": "Quak."
+  },
+  {
+    "id": 94,
+    "category": "Wortspiel",
+    "keywords": ["maulwurf", "restaurant", "gang", "essen"],
+    "setup": "Was bestellt ein Maulwurf im Restaurant?",
+    "punchline": "Ein Drei-Gaenge-Menue."
+  },
+  {
+    "id": 95,
+    "category": "Wortspiel",
+    "keywords": ["rotkaeppchen", "rot", "wald", "schnupfen"],
+    "setup": "Was ist rot, schnieft und laeuft durch den Wald?",
+    "punchline": "Rotzkaeppchen!"
+  },
+  {
+    "id": 96,
+    "category": "Wortspiel",
+    "keywords": ["herkules", "frau"],
+    "setup": "Wie heisst die Frau von Herkules?",
+    "punchline": "Frau Kules."
+  },
+  {
+    "id": 97,
+    "category": "Wortspiel",
+    "keywords": ["fussball", "messi", "trikot"],
+    "setup": "Welcher Fussballer verliert immer sein Trikot?",
+    "punchline": "Messi."
+  },
+  {
+    "id": 98,
+    "category": "Wortspiel",
+    "keywords": ["schokolade", "boesewicht", "suessigkeit"],
+    "setup": "Welche Suessigkeit essen Boesewichte?",
+    "punchline": "Schurkolade."
+  },
+  {
+    "id": 99,
+    "category": "Wortspiel",
+    "keywords": ["uhu", "baum", "sprachfehler"],
+    "setup": "Was sitzt auf dem Baum und schreit Aha?",
+    "punchline": "Ein Uhu mit Sprachfehler!"
+  },
+  {
+    "id": 100,
+    "category": "Wortspiel",
+    "keywords": ["busfahrer", "zeitform", "grammatik"],
+    "setup": "Welche Zeitform ist: Der Busfahrer ist puenktlich gewesen?",
+    "punchline": "Buskamperfekt."
+  },
+  {
+    "id": 101,
+    "category": "Arbeit",
+    "keywords": ["firma", "arbeit", "kollege"],
+    "setup": "Wie viele Menschen arbeiten bei euch in der Firma?",
+    "punchline": "Etwa die Haelfte."
+  },
+  {
+    "id": 102,
+    "category": "Arbeit",
+    "keywords": ["chef", "spaet", "arbeit"],
+    "setup": "Chef: Sie kommen schon wieder zu spaet! Was schliessen Sie daraus?",
+    "punchline": "Dass heute Donnerstag ist."
+  },
+  {
+    "id": 103,
+    "category": "Arbeit",
+    "keywords": ["ziel", "feierabend", "wochenende", "urlaub"],
+    "setup": "Chef: Welche Ziele haben Sie? - Feierabend. - Langfristig? - Wochenende.",
+    "punchline": "Wirklich langfristig? - Urlaub."
+  },
+  {
+    "id": 104,
+    "category": "Arbeit",
+    "keywords": ["beamter", "arbeit", "nichts"],
+    "setup": "Sagt ein Beamter zum anderen:",
+    "punchline": "Wir tun ja nichts!"
+  },
+  {
+    "id": 105,
+    "category": "Arbeit",
+    "keywords": ["gehalt", "chef", "verhaeltnis"],
+    "setup": "Mein Gehalt steht in keinem Verhaeltnis zu meiner Leistung!",
+    "punchline": "Das wissen wir, aber wir koennen Sie doch nicht verhungern lassen."
+  },
+  {
+    "id": 106,
     "category": "Tier",
-    "keywords": ["schnecke", "langsam"],
+    "keywords": ["hund", "flugzeug", "pfote"],
+    "setup": "Was macht ein Hund im Flugzeug?",
+    "punchline": "Er gibt Pfotgas."
+  },
+  {
+    "id": 107,
+    "category": "Tier",
+    "keywords": ["fisch", "wand", "damm"],
+    "setup": "Was sagt ein Fisch, wenn er gegen eine Wand schwimmt?",
+    "punchline": "Damm!"
+  },
+  {
+    "id": 108,
+    "category": "Tier",
+    "keywords": ["schnecke", "schildkroete", "langsam", "schnell"],
     "setup": "Was macht eine Schnecke auf einem Schildkroetenpanzer?",
     "punchline": "Wheee!"
   },
   {
-    "id": 20,
+    "id": 109,
+    "category": "Tier",
+    "keywords": ["kaninchen", "fitness", "pumpernickel"],
+    "setup": "Wie nennt man ein Kaninchen im Fitnessstudio?",
+    "punchline": "Pumpernickel."
+  },
+  {
+    "id": 110,
+    "category": "Tier",
+    "keywords": ["hund", "ruhig", "nobelpreis"],
+    "setup": "Welchen Preis bekommen die ruhigsten Hunde?",
+    "punchline": "Den No-Bell-Preis."
+  },
+  {
+    "id": 111,
+    "category": "Tier",
+    "keywords": ["delfin", "unterhose", "slipper"],
+    "setup": "Wie nennt man Delfine in Unterhose?",
+    "punchline": "Slipper."
+  },
+  {
+    "id": 112,
+    "category": "Tier",
+    "keywords": ["hyaene", "steppe", "hygiene", "sauberkeit"],
+    "setup": "Was lebt in der Steppe und achtet auf Sauberkeit?",
+    "punchline": "Die Hygiaene."
+  },
+  {
+    "id": 113,
+    "category": "Tier",
+    "keywords": ["katze", "nacht", "muskelkater", "traum"],
+    "setup": "Wovon traeumt eine Katze nachts?",
+    "punchline": "Von Muskelkater."
+  },
+  {
+    "id": 114,
+    "category": "Tier",
+    "keywords": ["holzwurm", "vater", "sohn", "bank"],
+    "setup": "Was sagt ein stolzer Holzwurm-Papa?",
+    "punchline": "Mein Sohn arbeitet in der Bank!"
+  },
+  {
+    "id": 115,
     "category": "Allgemein",
-    "keywords": ["roboter", "ki", "kuenstliche intelligenz", "raspberry"],
+    "keywords": ["roboter", "ki", "kuenstliche intelligenz", "vernetzt"],
     "setup": "Warum sind Roboter nie einsam?",
     "punchline": "Weil sie immer gut vernetzt sind."
+  },
+  {
+    "id": 116,
+    "category": "Allgemein",
+    "keywords": ["blut", "spenden", "hundert", "prozent"],
+    "setup": "Egal, was du tust: Gib immer hundert Prozent!",
+    "punchline": "Ausser beim Blutspenden."
+  },
+  {
+    "id": 117,
+    "category": "Allgemein",
+    "keywords": ["pessimist", "optimist"],
+    "setup": "Pessimist: Schlimmer geht's nicht!",
+    "punchline": "Optimist: Doch!"
+  },
+  {
+    "id": 118,
+    "category": "Allgemein",
+    "keywords": ["jaeger", "wald", "treffen"],
+    "setup": "Treffen sich zwei Jaeger im Wald.",
+    "punchline": "Beide tot."
+  },
+  {
+    "id": 119,
+    "category": "Allgemein",
+    "keywords": ["seminar", "kleptomanie", "stehlen"],
+    "setup": "War im Seminar ueber Kleptomanie.",
+    "punchline": "Konnte einiges mitnehmen!"
+  },
+  {
+    "id": 120,
+    "category": "Allgemein",
+    "keywords": ["blatt", "lochen", "rand"],
+    "setup": "Habe ein Blatt gelocht.",
+    "punchline": "Aber das nur am Rande."
   }
 ]

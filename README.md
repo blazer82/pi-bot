@@ -48,6 +48,7 @@ Edit the `CONFIG` dict at the top of `pi_bot.py`:
 | `silence_threshold`  | `500`                    | RMS energy below this = silence              |
 | `silence_duration`   | `1.5`                    | Seconds of silence before stopping recording |
 | `max_record_seconds` | `15`                     | Maximum recording length                     |
+| `thinking`           | `False`                  | Enable `<think>` reasoning in ollama         |
 | `espeak_speed`       | `130`                    | Speech rate (words per minute)               |
 | `espeak_pitch`       | `40`                     | Pitch (0-99, lower = deeper)                 |
 | `mic_device`         | `None`                   | Microphone device index (None = default)     |
@@ -85,6 +86,38 @@ Edit `jokes.json`. Each joke has this structure:
   "punchline": "The punchline"
 }
 ```
+
+## Development on macOS
+
+You can run Pi-Bot in text-input chat mode on a Mac, bypassing all microphone and wake word hardware. This lets you test the actual Ollama conversation pipeline and TTS output.
+
+### Prerequisites
+
+- [Ollama](https://ollama.com/) installed and running (`ollama serve`)
+- An Ollama model pulled (e.g. `ollama pull gemma4:e2b-it-q4_K_M`)
+- espeak-ng: `brew install espeak-ng`
+
+### Setup
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install numpy requests pytest
+```
+
+The hardware-specific packages (`sounddevice`, `openwakeword`, `pywhispercpp`) are not needed for chat mode and are skipped.
+
+### Run chat mode
+
+```bash
+source venv/bin/activate
+python3 pi_bot.py --chat
+```
+
+Type messages to chat with the bot. Commands:
+
+- `reset` — clear conversation history (like a new wake-word activation)
+- `exit` / `quit` / Ctrl+C — stop
 
 ## Testing
 

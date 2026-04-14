@@ -11,9 +11,14 @@ import wave
 
 import numpy as np
 import requests
-import sounddevice as sd
-from openwakeword.model import Model as WakeModel
-from pywhispercpp.model import Model as WhisperModel
+try:
+    import sounddevice as sd
+    from openwakeword.model import Model as WakeModel
+    from pywhispercpp.model import Model as WhisperModel
+except ImportError:
+    sd = None
+    WakeModel = None
+    WhisperModel = None
 
 # ---------------------------------------------------------------------------
 # Configuration — edit these to taste
@@ -31,6 +36,7 @@ CONFIG = {
     "sample_rate": 16000,
     "context_turns": 6,                     # keep last N user/assistant pairs
     "followup_timeout": 8,                  # seconds to wait for follow-up speech
+    "thinking": False,                     # enable <think> reasoning in ollama
     "espeak_speed": 130,                    # words per minute
     "espeak_pitch": 40,                     # 0–99, lower = deeper
     "mic_device": None,                     # None = default, or int device index
@@ -252,6 +258,8 @@ def _ollama_chat_stream(messages, tools=None):
     }
     if tools:
         payload["tools"] = tools
+    if CONFIG["thinking"]:
+        payload["think"] = True
     r = requests.post(
         f"{CONFIG['ollama_url']}/api/chat",
         json=payload,
@@ -303,11 +311,13 @@ def stream_and_speak(messages, tools=None):
 
     Returns ``(full_response_text, tool_calls_or_None)``.
     """
+    cue = "Analysiere..." if CONFIG["language"] == "de" else "Analysing..."
+    speak(cue)
+
     buffer = ""
     full_response = ""
     in_think = False
     think_content = ""
-    think_cue_spoken = False
     tool_calls = None
 
     for chunk in _ollama_chat_stream(messages, tools=tools):
@@ -329,10 +339,6 @@ def stream_and_speak(messages, tools=None):
                                       ) if full_response else remainder.strip()
             in_think = True
             buffer = post
-            if not think_cue_spoken:
-                cue = "Analysiere..." if CONFIG["language"] == "de" else "Analysing..."
-                speak(cue)
-                think_cue_spoken = True
 
         if in_think:
             if "</think>" in buffer:
@@ -493,5 +499,60 @@ def main():
             speak(err_msg)
 
 
+def chat_mode():
+    """Text-input chat mode for development without microphone hardware."""
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    with open(os.path.join(script_dir, "jokes.json"), "r", encoding="utf-8") as f:
+        jokes_db = json.load(f)
+
+    print("Pi-Bot chat mode")
+    print('Type messages to chat. "reset" clears history, "exit" quits.')
+    print()
+
+    ready_msg = "Pi Bot ist bereit." if CONFIG["language"] == "de" else "Pi Bot is ready."
+    print(ready_msg)
+    speak(ready_msg)
+
+    conversation_history = []
+
+    try:
+        while True:
+            try:
+                text = input("> ")
+            except EOFError:
+                break
+
+            if not text.strip():
+                continue
+
+            cmd = text.strip().lower()
+            if cmd in ("exit", "quit"):
+                break
+            if cmd == "reset":
+                conversation_history = []
+                print("Conversation history cleared.")
+                continue
+
+            response = chat_with_ollama(text, conversation_history, jokes_db)
+            print(f"Pi-Bot: {response}\n")
+    except KeyboardInterrupt:
+        pass
+
+    print("\nBye.")
+
+
 if __name__ == "__main__":
-    main()
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Pi-Bot")
+    parser.add_argument(
+        "--chat",
+        action="store_true",
+        help="Text-input chat mode (no mic/wake word needed)",
+    )
+    args = parser.parse_args()
+
+    if args.chat:
+        chat_mode()
+    else:
+        main()

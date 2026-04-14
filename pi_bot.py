@@ -4,6 +4,7 @@
 import json
 import os
 import random
+import re
 import subprocess
 import tempfile
 import wave
@@ -29,6 +30,7 @@ CONFIG = {
     "max_record_seconds": 15,               # safety cap
     "sample_rate": 16000,
     "context_turns": 6,                     # keep last N user/assistant pairs
+    "followup_timeout": 8,                  # seconds to wait for follow-up speech
     "espeak_speed": 130,                    # words per minute
     "espeak_pitch": 40,                     # 0–99, lower = deeper
     "mic_device": None,                     # None = default, or int device index
@@ -100,7 +102,8 @@ def transcribe(whisper_model, audio_np):
             wf.writeframes(audio_np.tobytes())
 
     try:
-        segments = whisper_model.transcribe(tmp_path, language=CONFIG["language"])
+        segments = whisper_model.transcribe(
+            tmp_path, language=CONFIG["language"])
         text = " ".join(seg.text for seg in segments).strip()
     finally:
         os.unlink(tmp_path)
@@ -161,6 +164,60 @@ def record_until_silence():
     return np.concatenate(chunks)
 
 
+def wait_for_followup():
+    """Listen for follow-up speech within the timeout window.
+
+    Phase 1: wait up to ``followup_timeout`` seconds for speech onset.
+    Phase 2: once speech is detected, record until silence (same logic as
+    ``record_until_silence``).
+
+    Returns an int16 numpy array if speech was captured, or *None* if the
+    timeout expired without any speech.
+    """
+    sr = CONFIG["sample_rate"]
+    chunk_size = int(sr * 0.1)  # 100 ms chunks
+    timeout_chunks = int(CONFIG["followup_timeout"] / 0.1)
+    silence_chunks_needed = int(CONFIG["silence_duration"] / 0.1)
+    max_record_chunks = int(CONFIG["max_record_seconds"] / 0.1)
+
+    chunks = []
+    speech_detected = False
+    silent_count = 0
+
+    with sd.InputStream(
+        samplerate=sr,
+        channels=1,
+        dtype="int16",
+        blocksize=chunk_size,
+        device=CONFIG["mic_device"],
+    ) as stream:
+        # Phase 1 — wait for speech onset
+        for _ in range(timeout_chunks):
+            audio, _ = stream.read(chunk_size)
+            rms = np.sqrt(np.mean(audio.astype(np.float32) ** 2))
+            if rms >= CONFIG["silence_threshold"]:
+                speech_detected = True
+                chunks.append(audio.copy())
+                break
+
+        if not speech_detected:
+            return None
+
+        # Phase 2 — record until silence
+        for _ in range(max_record_chunks):
+            audio, _ = stream.read(chunk_size)
+            chunks.append(audio.copy())
+            rms = np.sqrt(np.mean(audio.astype(np.float32) ** 2))
+            if rms < CONFIG["silence_threshold"]:
+                silent_count += 1
+            else:
+                silent_count = 0
+            if silent_count >= silence_chunks_needed:
+                break
+
+    return np.concatenate(chunks)
+
+
 # ---------------------------------------------------------------------------
 # Tool execution
 # ---------------------------------------------------------------------------
@@ -179,58 +236,169 @@ def execute_tool(name, args, jokes_db):
 # ---------------------------------------------------------------------------
 # Ollama chat with tool-calling
 # ---------------------------------------------------------------------------
-def _ollama_chat(messages, tools=None):
-    """Raw POST to ollama /api/chat. Returns response dict."""
+
+
+def _ollama_chat_stream(messages, tools=None):
+    """POST to ollama /api/chat with streaming enabled.
+
+    Yields dicts of the form:
+      {"type": "content", "text": "..."}
+      {"type": "tool_calls", "tool_calls": [...]}
+    """
     payload = {
         "model": CONFIG["ollama_model"],
         "messages": messages,
-        "stream": False,
+        "stream": True,
     }
     if tools:
         payload["tools"] = tools
-    r = requests.post(f"{CONFIG['ollama_url']}/api/chat", json=payload, timeout=120)
+    r = requests.post(
+        f"{CONFIG['ollama_url']}/api/chat",
+        json=payload,
+        stream=True,
+        timeout=None,  # no cap — speaking blocks while the stream buffers
+    )
     r.raise_for_status()
-    return r.json()
+
+    for line in r.iter_lines():
+        if not line:
+            continue
+        chunk = json.loads(line)
+        msg = chunk.get("message", {})
+        if msg.get("tool_calls"):
+            yield {"type": "tool_calls", "tool_calls": msg["tool_calls"]}
+            return
+        content = msg.get("content", "")
+        if content:
+            yield {"type": "content", "text": content}
+        if chunk.get("done"):
+            return
+
+
+_SENTENCE_BOUNDARY = re.compile(r"(?<=[.!?])\s+")
+
+
+def _speak_sentences(buffer):
+    """Speak every complete sentence in *buffer*.
+
+    Returns ``(remainder, spoken_text)`` where *remainder* is the trailing
+    fragment that has not been spoken yet.
+    """
+    parts = _SENTENCE_BOUNDARY.split(buffer)
+    if len(parts) <= 1:
+        return buffer, ""
+
+    spoken = ""
+    for sentence in parts[:-1]:
+        s = sentence.strip()
+        if s:
+            speak(s)
+            spoken += s + " "
+    return parts[-1], spoken.strip()
+
+
+def stream_and_speak(messages, tools=None):
+    """Stream an Ollama response, handle ``<think>`` tags, and speak
+    sentence-by-sentence as tokens arrive.
+
+    Returns ``(full_response_text, tool_calls_or_None)``.
+    """
+    buffer = ""
+    full_response = ""
+    in_think = False
+    think_content = ""
+    think_cue_spoken = False
+    tool_calls = None
+
+    for chunk in _ollama_chat_stream(messages, tools=tools):
+        if chunk["type"] == "tool_calls":
+            tool_calls = chunk["tool_calls"]
+            break
+
+        buffer += chunk["text"]
+
+        # -- Thinking tag handling --
+        if not in_think and "<think>" in buffer:
+            pre, _, post = buffer.partition("<think>")
+            if pre.strip():
+                remainder, spoken = _speak_sentences(pre)
+                full_response += spoken
+                if remainder.strip():
+                    speak(remainder.strip())
+                    full_response += (" " + remainder.strip()
+                                      ) if full_response else remainder.strip()
+            in_think = True
+            buffer = post
+            if not think_cue_spoken:
+                cue = "Analysiere..." if CONFIG["language"] == "de" else "Analysing..."
+                speak(cue)
+                think_cue_spoken = True
+
+        if in_think:
+            if "</think>" in buffer:
+                think_part, _, remainder = buffer.partition("</think>")
+                think_content += think_part
+                print(f"[Think] {think_content.strip()}")
+                in_think = False
+                buffer = remainder
+            else:
+                think_content += buffer
+                buffer = ""
+                continue
+
+        # -- Sentence-by-sentence speaking --
+        buffer, spoken = _speak_sentences(buffer)
+        if spoken:
+            full_response += (" " + spoken) if full_response else spoken
+
+    # Speak any remaining text in the buffer
+    leftover = buffer.strip()
+    if leftover and not in_think:
+        speak(leftover)
+        full_response += (" " + leftover) if full_response else leftover
+
+    return full_response.strip(), tool_calls
 
 
 def chat_with_ollama(user_text, conversation_history, jokes_db):
-    """Send user message to ollama, handle tool calls, return final text."""
+    """Send user message to ollama, handle tool calls, stream and speak."""
     system_prompt = SYSTEM_PROMPT_DE if CONFIG["language"] == "de" else SYSTEM_PROMPT_EN
 
     messages = [{"role": "system", "content": system_prompt}]
     messages.extend(conversation_history)
     messages.append({"role": "user", "content": user_text})
 
-    response = _ollama_chat(messages, tools=TOOLS)
-    msg = response["message"]
+    full_response, tool_calls = stream_and_speak(messages, tools=TOOLS)
 
-    # Tool-call loop (max 3 rounds)
+    # Tool-call loop (max 3 rounds) — falls back to non-streaming
     for _ in range(3):
-        tool_calls = msg.get("tool_calls")
         if not tool_calls:
             break
 
-        messages.append(msg)
-
+        messages.append({"role": "assistant", "content": "",
+                        "tool_calls": tool_calls})
         for tc in tool_calls:
             fn_name = tc["function"]["name"]
             fn_args = tc["function"]["arguments"]
             result = execute_tool(fn_name, fn_args, jokes_db)
             messages.append({"role": "tool", "content": result})
 
-        response = _ollama_chat(messages, tools=TOOLS)
-        msg = response["message"]
+        # Stream the post-tool response too
+        full_response, tool_calls = stream_and_speak(messages, tools=TOOLS)
 
-    assistant_text = msg.get("content", "")
+    # Strip any residual thinking tags (safety net for tool-call path)
+    full_response = re.sub(r"<think>.*?</think>", "",
+                           full_response, flags=re.DOTALL).strip()
 
     # Update conversation history
     conversation_history.append({"role": "user", "content": user_text})
-    conversation_history.append({"role": "assistant", "content": assistant_text})
+    conversation_history.append(
+        {"role": "assistant", "content": full_response})
     max_msgs = CONFIG["context_turns"] * 2
     while len(conversation_history) > max_msgs:
         conversation_history.pop(0)
 
-    return assistant_text
+    return full_response
 
 
 # ---------------------------------------------------------------------------
@@ -249,22 +417,34 @@ def main():
     with open(os.path.join(script_dir, "jokes.json"), "r", encoding="utf-8") as f:
         jokes_db = json.load(f)
 
-    conversation_history = []
+    no_hear = (
+        "Ich habe nichts verstanden."
+        if CONFIG["language"] == "de"
+        else "I didn't catch that."
+    )
+    err_msg = (
+        "Es gab einen Fehler."
+        if CONFIG["language"] == "de"
+        else "There was an error."
+    )
 
     ready_msg = "Pi Bot ist bereit." if CONFIG["language"] == "de" else "Pi Bot is ready."
     print(ready_msg)
     speak(ready_msg)
 
-    print("Listening for wake word...")
-
     while True:
         try:
+            print("Listening for wake word...")
             listen_for_wake_word(wake_model)
             print("Wake word detected!")
+
+            # Fresh conversation context per wake-word activation
+            conversation_history = []
 
             ack = "Ja?" if CONFIG["language"] == "de" else "Yes?"
             speak(ack)
 
+            # --- First utterance ---
             print("Recording...")
             audio = record_until_silence()
             duration = len(audio) / CONFIG["sample_rate"]
@@ -275,11 +455,6 @@ def main():
             print(f"User: {text}")
 
             if not text.strip():
-                no_hear = (
-                    "Ich habe nichts verstanden."
-                    if CONFIG["language"] == "de"
-                    else "I didn't catch that."
-                )
                 speak(no_hear)
                 continue
 
@@ -287,18 +462,34 @@ def main():
             response = chat_with_ollama(text, conversation_history, jokes_db)
             print(f"Pi-Bot: {response}")
 
-            speak(response)
+            # --- Follow-up loop ---
+            while True:
+                print("Listening for follow-up...")
+                audio = wait_for_followup()
+                if audio is None:
+                    print("No follow-up detected, returning to wake word.")
+                    break
+
+                duration = len(audio) / CONFIG["sample_rate"]
+                print(f"Recorded {duration:.1f}s of audio")
+
+                print("Transcribing...")
+                text = transcribe(whisper_model, audio)
+                print(f"User: {text}")
+
+                if not text.strip():
+                    continue  # empty transcription — keep listening for follow-up
+
+                print("Thinking...")
+                response = chat_with_ollama(
+                    text, conversation_history, jokes_db)
+                print(f"Pi-Bot: {response}")
 
         except KeyboardInterrupt:
             print("\nShutting down.")
             break
         except Exception as e:
             print(f"Error: {e}")
-            err_msg = (
-                "Es gab einen Fehler."
-                if CONFIG["language"] == "de"
-                else "There was an error."
-            )
             speak(err_msg)
 
 

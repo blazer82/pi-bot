@@ -171,7 +171,8 @@ class TestChatWithOllama:
     def test_builds_messages_with_system_prompt(self, mock_sas):
         mock_sas.return_value = ("Reply.", None)
         history = []
-        chat_with_ollama("Hello", history, SAMPLE_JOKES)
+        response, end = chat_with_ollama("Hello", history, SAMPLE_JOKES)
+        assert end is False
 
         messages = mock_sas.call_args[0][0]
         assert messages[0]["role"] == "system"
@@ -182,7 +183,7 @@ class TestChatWithOllama:
     def test_updates_conversation_history(self, mock_sas):
         mock_sas.return_value = ("The reply.", None)
         history = []
-        chat_with_ollama("Hi", history, SAMPLE_JOKES)
+        response, end = chat_with_ollama("Hi", history, SAMPLE_JOKES)
 
         assert len(history) == 2
         assert history[0] == {"role": "user", "content": "Hi"}
@@ -191,6 +192,7 @@ class TestChatWithOllama:
     @mock.patch("pi_bot.chat.stream_and_speak")
     def test_trims_history_to_context_turns(self, mock_sas):
         mock_sas.return_value = ("Reply.", None)
+        # chat_with_ollama now returns (response, end_conversation) tuple
         original = CONFIG["context_turns"]
         try:
             CONFIG["context_turns"] = 2  # keep 4 messages
@@ -212,9 +214,10 @@ class TestChatWithOllama:
         mock_exec.return_value = '{"setup": "...", "punchline": "..."}'
 
         history = []
-        result = chat_with_ollama("Tell me a joke", history, SAMPLE_JOKES)
+        result, end = chat_with_ollama("Tell me a joke", history, SAMPLE_JOKES)
 
         assert "joke" in result.lower() or result == "Here is a joke!"
+        assert end is False
         mock_exec.assert_called_once_with("get_random_joke", {}, SAMPLE_JOKES)
         assert mock_sas.call_count == 2
 
@@ -222,7 +225,7 @@ class TestChatWithOllama:
     def test_strips_residual_think_tags(self, mock_sas):
         mock_sas.return_value = ("<think>stuff</think>Clean answer.", None)
         history = []
-        result = chat_with_ollama("Hi", history, SAMPLE_JOKES)
+        result, end = chat_with_ollama("Hi", history, SAMPLE_JOKES)
         assert "think" not in result
         assert "Clean answer." in result
 
@@ -233,12 +236,27 @@ class TestChatWithOllama:
         try:
             CONFIG["language"] = "de"
             history = []
-            chat_with_ollama("Hallo", history, SAMPLE_JOKES)
+            response, end = chat_with_ollama("Hallo", history, SAMPLE_JOKES)
             messages = mock_sas.call_args[0][0]
             assert messages[0]["content"].startswith(SYSTEM_PROMPT_DE)
             assert "Aktuelles Datum und Uhrzeit:" in messages[0]["content"]
         finally:
             CONFIG["language"] = original
+
+    @mock.patch("pi_bot.chat.execute_tool")
+    @mock.patch("pi_bot.chat.stream_and_speak")
+    def test_end_conversation_tool_returns_true(self, mock_sas, mock_exec):
+        tc = [{"function": {"name": "end_conversation", "arguments": {}}}]
+        mock_sas.side_effect = [
+            ("", tc),
+            ("Goodbye!", None),
+        ]
+        mock_exec.return_value = '{"status": "conversation_ended"}'
+
+        history = []
+        result, end = chat_with_ollama("That's all, thanks", history, SAMPLE_JOKES)
+        assert end is True
+        assert result == "Goodbye!"
 
     @mock.patch("pi_bot.chat.stream_and_speak")
     def test_uses_english_prompt_when_configured(self, mock_sas):
@@ -247,7 +265,7 @@ class TestChatWithOllama:
         try:
             CONFIG["language"] = "en"
             history = []
-            chat_with_ollama("Hello", history, SAMPLE_JOKES)
+            response, end = chat_with_ollama("Hello", history, SAMPLE_JOKES)
             messages = mock_sas.call_args[0][0]
             assert messages[0]["content"].startswith(SYSTEM_PROMPT_EN)
             assert "Current date and time:" in messages[0]["content"]

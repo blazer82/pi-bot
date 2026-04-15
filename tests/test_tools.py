@@ -174,6 +174,11 @@ class TestExecuteTool:
         parsed = json.loads(result)
         assert parsed["cpu_percent"] == 25.0
 
+    def test_end_conversation_dispatch(self):
+        result = execute_tool("end_conversation", {}, SAMPLE_JOKES)
+        parsed = json.loads(result)
+        assert parsed["status"] == "conversation_ended"
+
     def test_unknown_tool(self):
         result = execute_tool("nonexistent", {}, SAMPLE_JOKES)
         parsed = json.loads(result)

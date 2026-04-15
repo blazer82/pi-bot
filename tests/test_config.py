@@ -16,9 +16,9 @@ class TestConfig:
             assert key in CONFIG, f"Missing config key: {key}"
 
     def test_tools_schema_valid(self):
-        assert len(TOOLS) == 3
+        assert len(TOOLS) == 4
         names = {t["function"]["name"] for t in TOOLS}
-        assert names == {"get_random_joke", "get_weather_forecast", "get_system_status"}
+        assert names == {"get_random_joke", "get_weather_forecast", "get_system_status", "end_conversation"}
         for tool in TOOLS:
             assert tool["type"] == "function"
 

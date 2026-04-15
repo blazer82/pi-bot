@@ -40,7 +40,8 @@ SYSTEM_PROMPT_DE = (
     "Wenn jemand nach einem Witz fragt, benutze das get_random_joke Tool. "
     "Wenn jemand nach dem Wetter fragt, benutze das get_weather_forecast Tool. "
     "Wenn jemand fragt wie es dir geht, benutze das get_system_status Tool und antworte kreativ basierend auf deinem Systemzustand. "
-    "Halte deine Antworten unter 3 Saetzen, ausser es wird mehr verlangt."
+    "Halte deine Antworten unter 3 Saetzen, ausser es wird mehr verlangt. "
+    "Wenn du sicher bist, dass das Gespraech beendet ist, benutze das end_conversation Tool."
 )
 
 SYSTEM_PROMPT_EN = (
@@ -50,7 +51,8 @@ SYSTEM_PROMPT_EN = (
     "If someone asks for a joke, use the get_random_joke tool. "
     "If someone asks about the weather, use the get_weather_forecast tool. "
     "If someone asks how you are doing, use the get_system_status tool and answer creatively based on your system state. "
-    "Keep responses under 3 sentences unless more is requested."
+    "Keep responses under 3 sentences unless more is requested. "
+    "When you are confident the conversation has ended, use the end_conversation tool."
 )
 
 # ---------------------------------------------------------------------------
@@ -86,6 +88,18 @@ TOOLS = [
         "function": {
             "name": "get_system_status",
             "description": "Returns system status of the Raspberry Pi: CPU temperature, CPU usage, memory usage, disk usage, and uptime.",
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "end_conversation",
+            "description": "End the current conversation. Call this when the user indicates they are done or no longer need assistance.",
             "parameters": {
                 "type": "object",
                 "properties": {},

@@ -150,6 +150,7 @@ def chat_with_ollama(user_text, conversation_history, jokes_db):
     full_response, tool_calls = stream_and_speak(messages, tools=TOOLS)
 
     # Tool-call loop (max 3 rounds) — falls back to non-streaming
+    end_conversation = False
     for _ in range(3):
         if not tool_calls:
             break
@@ -159,6 +160,8 @@ def chat_with_ollama(user_text, conversation_history, jokes_db):
         for tc in tool_calls:
             fn_name = tc["function"]["name"]
             fn_args = tc["function"]["arguments"]
+            if fn_name == "end_conversation":
+                end_conversation = True
             result = execute_tool(fn_name, fn_args, jokes_db)
             messages.append({"role": "tool", "content": result})
 
@@ -177,4 +180,4 @@ def chat_with_ollama(user_text, conversation_history, jokes_db):
     while len(conversation_history) > max_msgs:
         conversation_history.pop(0)
 
-    return full_response
+    return full_response, end_conversation

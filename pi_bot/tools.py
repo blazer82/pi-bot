@@ -148,4 +148,6 @@ def execute_tool(name, args, jokes_db):
         return get_weather_forecast()
     if name == "get_system_status":
         return get_system_status()
+    if name == "end_conversation":
+        return json.dumps({"status": "conversation_ended"})
     return json.dumps({"error": f"Unknown tool: {name}"})

@@ -74,8 +74,12 @@ def main():
                 continue
 
             print("Thinking...")
-            response = chat_with_ollama(text, conversation_history, jokes_db)
+            response, end = chat_with_ollama(text, conversation_history, jokes_db)
             print(f"Pi-Bot: {response}")
+
+            if end:
+                print("Conversation ended by bot.")
+                continue
 
             # --- Follow-up loop ---
             while True:
@@ -96,9 +100,13 @@ def main():
                     continue  # empty transcription — keep listening for follow-up
 
                 print("Thinking...")
-                response = chat_with_ollama(
+                response, end = chat_with_ollama(
                     text, conversation_history, jokes_db)
                 print(f"Pi-Bot: {response}")
+
+                if end:
+                    print("Conversation ended by bot.")
+                    break
 
         except KeyboardInterrupt:
             print("\nShutting down.")
@@ -141,8 +149,11 @@ def chat_mode():
                 print("Conversation history cleared.")
                 continue
 
-            response = chat_with_ollama(text, conversation_history, jokes_db)
+            response, end = chat_with_ollama(text, conversation_history, jokes_db)
             print(f"Pi-Bot: {response}\n")
+
+            if end:
+                break
     except KeyboardInterrupt:
         pass
 

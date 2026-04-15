@@ -64,71 +64,74 @@ Edit the `CONFIG` dict at the top of `pi_bot.py`:
 
 ## USB Audio Setup
 
-Pi-Bot uses two separate USB audio devices: one for the microphone and one for the speaker. After running `setup.sh`, follow these steps to configure them.
+Pi-Bot uses two separate USB audio devices: one for the microphone and one for the speaker. The setup script installs PipeWire for audio routing, which is more reliable than raw ALSA for USB device management.
+
+**Important:** After running `setup.sh` for the first time, reboot so PipeWire services start properly:
+
+```bash
+sudo reboot
+```
 
 ### 1. Identify your devices
 
-The setup script prints detected audio devices at the end. You can also run:
+After rebooting, check PipeWire devices:
+
+```bash
+wpctl status
+```
+
+Look for your USB mic under **Sources** and your USB speaker under **Sinks**. Note their ID numbers (the number in the leftmost column).
+
+You can also check sounddevice indices (used by the Python code):
 
 ```bash
 python3 -c "import sounddevice; print(sounddevice.query_devices())"
 ```
 
-Example output:
+### 2. Set default audio devices
 
-```
-  0  USB Mic Device: Audio (hw:1,0), ALSA (1 in, 0 out)
-  1  USB Speaker Device: Audio (hw:2,0), ALSA (0 in, 2 out)
-  2  bcm2835 Headphones: - (hw:0,0), ALSA (0 in, 2 out)
-```
-
-The mic is the USB device with input channels, the speaker is the one with output channels. Note their **index numbers**.
-
-### 2. Configure Pi-Bot
-
-Edit `pi_bot/config.py` and set the device indices in the `CONFIG` dict:
-
-```python
-"mic_device": 0,       # replace with your mic's index
-"speaker_device": 1,   # replace with your speaker's index
-```
-
-### 3. Route espeak-ng to the USB speaker
-
-espeak-ng uses ALSA directly, not the Python sounddevice library, so it needs its own configuration. First, find your USB speaker's ALSA card number:
+Tell PipeWire to use your USB devices as defaults:
 
 ```bash
-aplay -l
+wpctl set-default <sink-id>     # your USB speaker's sink ID
+wpctl set-default <source-id>   # your USB mic's source ID
 ```
 
-Then create or edit `~/.asoundrc`:
+This routes all audio (including espeak-ng) through PipeWire automatically — no `~/.asoundrc` needed.
 
-```
-pcm.!default {
-    type hw
-    card 2
-}
-```
+### 3. Configure Pi-Bot
 
-Replace `card 2` with your USB speaker's card number from `aplay -l`. Note that ALSA card numbers and sounddevice index numbers are often different.
+Edit `pi_bot/config.py` and set the sounddevice indices in the `CONFIG` dict:
+
+```python
+"mic_device": 0,       # replace with your mic's sounddevice index
+"speaker_device": 1,   # replace with your speaker's sounddevice index
+```
 
 ### 4. Test audio
 
 ```bash
-# Test speaker (espeak-ng)
+# Test speaker (espeak-ng, routed through PipeWire)
 espeak-ng -v de "Hallo, ich bin Pi Bot."
 
 # Test mic (record 3 seconds and play back)
-arecord -d 3 -D hw:1,0 test.wav && aplay test.wav
+pw-record --rate 16000 --channels 1 test.wav
+pw-play test.wav
 ```
-
-Replace `hw:1,0` with your mic's ALSA hardware address from `arecord -l`.
 
 ### Troubleshooting
 
-- If you hear no sound from espeak-ng, double-check the card number in `~/.asoundrc` matches `aplay -l`.
-- If the bot doesn't detect speech, verify `CONFIG["mic_device"]` matches the correct sounddevice index and that `arecord` picks up audio from your mic.
-- If devices change index after a reboot, unplug and replug them in the same order, or use `udev` rules to assign stable names.
+- If you hear no sound from espeak-ng, verify PipeWire is running (`systemctl --user status pipewire`) and the correct sink is set as default (`wpctl status`).
+- If the bot doesn't detect speech, verify `CONFIG["mic_device"]` matches the correct sounddevice index and that `pw-record` picks up audio from your mic.
+- If PipeWire isn't running over SSH, make sure `loginctl enable-linger` was set during setup (the setup script does this automatically).
+- **ALSA fallback:** If PipeWire causes issues, you can route espeak-ng directly via ALSA. Find your speaker's card number with `aplay -l`, then create `~/.asoundrc`:
+  ```
+  pcm.!default {
+      type hw
+      card 2
+  }
+  ```
+  Replace `card 2` with your speaker's ALSA card number.
 
 ## Adding Jokes
 

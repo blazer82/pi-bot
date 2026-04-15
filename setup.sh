@@ -16,7 +16,17 @@ echo ""
 echo "--- Installing system packages ---"
 sudo apt update
 sudo apt install -y espeak-ng python3-pip python3-venv cmake build-essential \
-    libportaudio2 libsndfile1
+    libportaudio2 libsndfile1 \
+    pipewire pipewire-pulse pipewire-alsa wireplumber alsa-utils
+
+# -----------------------------------------------------------------------
+# 1b. Audio group & user services
+# -----------------------------------------------------------------------
+echo ""
+echo "--- Configuring audio permissions and services ---"
+sudo usermod -aG audio "$USER"
+sudo loginctl enable-linger "$USER"
+systemctl --user enable --now pipewire wireplumber pipewire-pulse 2>/dev/null || true
 
 # -----------------------------------------------------------------------
 # 2. Python virtual environment
@@ -29,6 +39,13 @@ fi
 source "$VENV_DIR/bin/activate"
 pip install --upgrade pip
 pip install -r "$SCRIPT_DIR/requirements.txt"
+
+# Set OpenMP threads to match Pi 5 core count for whisper.cpp performance
+if ! grep -q 'OMP_NUM_THREADS' ~/.bashrc 2>/dev/null; then
+    echo 'export OMP_NUM_THREADS=4' >> ~/.bashrc
+    echo "Added OMP_NUM_THREADS=4 to ~/.bashrc"
+fi
+export OMP_NUM_THREADS=4
 
 # -----------------------------------------------------------------------
 # 3. Download openWakeWord models
@@ -86,10 +103,18 @@ fi
 # -----------------------------------------------------------------------
 echo ""
 echo "--- Detected audio devices ---"
+echo ""
+echo "PipeWire devices (wpctl):"
+wpctl status 2>/dev/null || echo "  PipeWire not yet active (may need a reboot after first install)"
+echo ""
+echo "sounddevice devices:"
 python3 -c "import sounddevice; print(sounddevice.query_devices())"
 
 echo ""
 echo "=== Setup complete! ==="
+echo ""
+echo "NOTE: If this is a fresh PipeWire install, reboot for audio services"
+echo "to start properly: sudo reboot"
 echo ""
 echo "To run Pi-Bot:"
 echo "  source $VENV_DIR/bin/activate"

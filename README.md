@@ -20,6 +20,14 @@ python3 pi_bot.py
 
 Say **"Hey Jarvis"** to activate, then speak your question. Pi-Bot responds via the speaker.
 
+To keep the Ollama model loaded in memory for faster responses, run:
+
+```bash
+ollama run gemma4:e2b-it-q4_K_M --keepalive "-1m"
+```
+
+Then type `/bye` to exit the interactive session — the model stays resident.
+
 ## How It Works
 
 ```

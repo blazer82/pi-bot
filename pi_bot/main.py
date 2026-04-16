@@ -24,7 +24,7 @@ def main():
     print("Pi-Bot starting up...")
 
     print("Loading wake word model...")
-    wake_model = WakeModel(wakeword_models=[CONFIG["wake_model"]])
+    wake_model = WakeModel(wakeword_model_paths=[CONFIG["wake_model"]])
 
     print("Loading whisper model...")
     whisper_model = WhisperModel(CONFIG["whisper_model"])

@@ -73,23 +73,12 @@ echo "--- Pulling $OLLAMA_MODEL (this will take a while on first run) ---"
 ollama pull "$OLLAMA_MODEL"
 
 # -----------------------------------------------------------------------
-# 6. (Optional) Install MBROLA voices for smoother German TTS
+# 6. Install MBROLA voices for smoother German TTS
 # -----------------------------------------------------------------------
 echo ""
-echo "--- Optional: MBROLA voices ---"
-echo "The default espeak-ng voice (-v de) is robotic. MBROLA voices sound"
-echo "smoother/more natural. Install them? Available: de1(F) de2(M) de3(F)"
-echo "de4(M) de5(F) de6(M) de7(F) de8(M)"
-read -rp "Install MBROLA German voices? [y/N] " install_mbrola
-if [[ "${install_mbrola,,}" == "y" ]]; then
-    sudo apt install -y mbrola mbrola-de1 mbrola-de2 mbrola-de3 mbrola-de4 \
-        mbrola-de5 mbrola-de6 mbrola-de7 mbrola-de8
-    echo "Installed! To use, set language in CONFIG to e.g. 'mb-de2' (male)"
-    echo "Test with: espeak-ng -v mb-de2 -s 130 -p 40 'Hallo, ich bin Pi Bot.'"
-else
-    echo "Skipped. You can install later with:"
-    echo "  sudo apt install mbrola mbrola-de2"
-fi
+echo "--- Installing MBROLA German voices ---"
+sudo apt install -y mbrola mbrola-de1 mbrola-de2 mbrola-de3 mbrola-de4 \
+    mbrola-de5 mbrola-de6 mbrola-de7 mbrola-de8
 
 # -----------------------------------------------------------------------
 # 7. Audio device check

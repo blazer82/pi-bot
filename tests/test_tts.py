@@ -19,16 +19,16 @@ class TestSpeak:
         assert "-p" in cmd
 
     @mock.patch("pi_bot.tts.subprocess.run")
-    def test_uses_config_language(self, mock_run):
-        original = CONFIG["language"]
+    def test_uses_config_voice(self, mock_run):
+        original = CONFIG["espeak_voice"]
         try:
-            CONFIG["language"] = "en"
+            CONFIG["espeak_voice"] = "mb-de4"
             speak("test")
             cmd = mock_run.call_args[0][0]
-            lang_idx = cmd.index("-v") + 1
-            assert cmd[lang_idx] == "en"
+            voice_idx = cmd.index("-v") + 1
+            assert cmd[voice_idx] == "mb-de4"
         finally:
-            CONFIG["language"] = original
+            CONFIG["espeak_voice"] = original
 
     @mock.patch("pi_bot.tts.subprocess.run")
     def test_uses_config_speed_and_pitch(self, mock_run):

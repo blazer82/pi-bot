@@ -57,6 +57,7 @@ Edit the `CONFIG` dict at the top of `pi_bot.py`:
 | `silence_duration`   | `1.5`                       | Seconds of silence before stopping recording |
 | `max_record_seconds` | `15`                        | Maximum recording length                     |
 | `thinking`           | `False`                     | Enable `<think>` reasoning in ollama         |
+| `espeak_voice`       | `"mb-de4"`                  | MBROLA voice or espeak-ng language code      |
 | `espeak_speed`       | `130`                       | Speech rate (words per minute)               |
 | `espeak_pitch`       | `40`                        | Pitch (0-99, lower = deeper)                 |
 | `mic_device`         | `None`                      | Microphone device index (None = default)     |

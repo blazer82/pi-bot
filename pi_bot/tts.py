@@ -9,7 +9,7 @@ def speak(text):
     """Speak text via espeak-ng. Blocks until done."""
     cmd = [
         "espeak-ng",
-        "-v", CONFIG["language"],
+        "-v", CONFIG["espeak_voice"],
         "-s", str(CONFIG["espeak_speed"]),
         "-p", str(CONFIG["espeak_pitch"]),
         text,

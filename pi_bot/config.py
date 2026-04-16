@@ -21,6 +21,7 @@ CONFIG = {
     "context_turns": 25,                    # keep last N user/assistant pairs
     "followup_timeout": 8,                  # seconds to wait for follow-up speech
     "thinking": False,                     # enable <think> reasoning in ollama
+    "espeak_voice": "mb-de4",               # MBROLA voice (e.g. mb-de4) or espeak lang
     "espeak_speed": 130,                    # words per minute
     "espeak_pitch": 40,                     # 0–99, lower = deeper
     "mic_device": None,                     # None = default, or int device index

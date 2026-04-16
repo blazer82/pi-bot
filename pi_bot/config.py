@@ -11,7 +11,7 @@ CONFIG = {
     "language": "de",                       # "de" or "en"
     "ollama_model": "gemma4:e2b-it-q4_K_M",
     "ollama_url": "http://localhost:11434",
-    "whisper_model": "small",               # tiny, base, small, medium
+    "whisper_model": "base",                # tiny, base, small, medium
     "wake_model": os.path.join(_REPO_DIR, "models", "hey_pee_bot.onnx"),
     "wake_threshold": 0.5,                  # 0.0–1.0
     "silence_threshold": 500,               # RMS energy below this = silence

@@ -136,17 +136,25 @@ def _speak_sentences(buffer):
     return buffer, ""
 
 
-def stream_and_speak(messages, tools=None):
+def stream_and_speak(messages, tools=None, slow_start=False):
     """Stream an Ollama response, handle ``<think>`` tags, and speak
     sentence-by-sentence as tokens arrive.
 
     Returns ``(raw_response_text, tool_calls_or_None)``.
     The raw response preserves Ollama's exact text (minus think tags) so that
     the conversation history matches the KV cache prefix on the next turn.
+
+    When *slow_start* is True (KV cache miss expected), a longer cue is spoken
+    to set expectations.
     """
     # Speak the cue in a background thread so the Ollama request starts
     # immediately — saves ~0.5-1s of dead time.
-    cue = "Moment..." if CONFIG["language"] == "de" else "Analysing..."
+    if slow_start:
+        cue = ("Moment, ich muss kurz meine Gedanken sortieren. Bin gleich da."
+               if CONFIG["language"] == "de"
+               else "Let me think about that for a moment...")
+    else:
+        cue = "Moment..." if CONFIG["language"] == "de" else "Analysing..."
     cue_thread = threading.Thread(target=speak, args=(cue,), daemon=True)
     cue_thread.start()
 
@@ -212,11 +220,23 @@ def chat_with_ollama(user_text, conversation_history, jokes_db):
     """Send user message to ollama, handle tool calls, stream and speak."""
     system_prompt = SYSTEM_PROMPT_DE if CONFIG["language"] == "de" else SYSTEM_PROMPT_EN
 
+    # Trim history BEFORE building messages.  Instead of popping one pair
+    # every turn (which shifts the prefix and invalidates Ollama's KV cache
+    # every time), we trim in one batch — dropping to half the limit.  This
+    # keeps the prefix stable for several turns so the KV cache is reused.
+    max_msgs = CONFIG["context_turns"] * 2
+    cache_miss = len(conversation_history) >= max_msgs
+    if cache_miss:
+        keep = max_msgs // 2
+        keep = keep - (keep % 2)  # ensure we keep full pairs
+        conversation_history[:] = conversation_history[-keep:]
+
     messages = [{"role": "system", "content": system_prompt}]
     messages.extend(conversation_history)
     messages.append({"role": "user", "content": user_text})
 
-    raw_response, tool_calls = stream_and_speak(messages, tools=TOOLS)
+    raw_response, tool_calls = stream_and_speak(
+        messages, tools=TOOLS, slow_start=cache_miss)
 
     # Tool-call loop (max 3 rounds)
     end_conversation = False
@@ -241,15 +261,12 @@ def chat_with_ollama(user_text, conversation_history, jokes_db):
         # Stream the post-tool response too
         raw_response, tool_calls = stream_and_speak(messages, tools=TOOLS)
 
-    # Update conversation history — preserve exact messages so the Ollama
-    # KV cache prefix matches on the next turn.
+    # Append to history — no trimming here, trim happens at the start of
+    # the next call so the prefix stays stable between turns.
     conversation_history.append({"role": "user", "content": user_text})
     for msg in tool_messages:
         conversation_history.append(msg)
     conversation_history.append(
         {"role": "assistant", "content": raw_response})
-    max_msgs = CONFIG["context_turns"] * 2
-    while len(conversation_history) > max_msgs:
-        conversation_history.pop(0)
 
     return raw_response, end_conversation

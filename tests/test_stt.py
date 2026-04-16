@@ -1,6 +1,5 @@
 """Tests for speech-to-text."""
 
-import os
 from unittest import mock
 
 import numpy as np
@@ -10,7 +9,7 @@ from pi_bot.stt import transcribe
 
 
 class TestTranscribe:
-    def test_transcribes_audio_and_cleans_up(self):
+    def test_transcribes_audio(self):
         audio = np.zeros(16000, dtype=np.int16)
 
         mock_model = mock.MagicMock()
@@ -22,8 +21,9 @@ class TestTranscribe:
 
         assert result == "Hello there"
         mock_model.transcribe.assert_called_once()
-        tmp_path = mock_model.transcribe.call_args[0][0]
-        assert not os.path.exists(tmp_path)
+        # preprocessed audio is passed as a float32 numpy array
+        audio_arg = mock_model.transcribe.call_args[0][0]
+        assert audio_arg.dtype == np.float32
 
     def test_multiple_segments_joined(self):
         audio = np.zeros(16000, dtype=np.int16)

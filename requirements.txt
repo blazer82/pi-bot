@@ -4,3 +4,6 @@ sounddevice
 numpy
 requests
 psutil
+noisereduce
+scipy
+webrtcvad-wheels

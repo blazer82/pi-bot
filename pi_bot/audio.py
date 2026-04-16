@@ -15,6 +15,28 @@ from pi_bot.config import CONFIG
 _WAKE_KEY = os.path.splitext(os.path.basename(CONFIG["wake_model"]))[0]
 
 
+def calibrate_noise_floor(duration=0.5):
+    """Record ambient noise and adapt the silence threshold.
+
+    Records *duration* seconds of audio, measures the RMS level, and sets
+    ``CONFIG["silence_threshold"]`` to ``rms * 1.8`` so the threshold
+    tracks the actual environment instead of relying on a hard-coded value.
+    """
+    sr = CONFIG["sample_rate"]
+    samples = int(sr * duration)
+    with sd.InputStream(
+        samplerate=sr,
+        channels=1,
+        dtype="int16",
+        blocksize=samples,
+        device=CONFIG["mic_device"],
+    ) as stream:
+        audio, _ = stream.read(samples)
+    rms = np.sqrt(np.mean(audio.astype(np.float32) ** 2))
+    CONFIG["silence_threshold"] = max(rms * 1.8, 100)  # floor of 100 to avoid over-sensitivity
+    print(f"Noise floor calibrated: RMS={rms:.0f}, threshold={CONFIG['silence_threshold']:.0f}")
+
+
 def listen_for_wake_word(wake_model):
     """Block until the wake word is detected."""
     wake_model.reset()

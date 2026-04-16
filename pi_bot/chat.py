@@ -132,7 +132,9 @@ def stream_and_speak(messages, tools=None):
     """Stream an Ollama response, handle ``<think>`` tags, and speak
     sentence-by-sentence as tokens arrive.
 
-    Returns ``(full_response_text, tool_calls_or_None)``.
+    Returns ``(raw_response_text, tool_calls_or_None)``.
+    The raw response preserves Ollama's exact text (minus think tags) so that
+    the conversation history matches the KV cache prefix on the next turn.
     """
     # Speak the cue in a background thread so the Ollama request starts
     # immediately — saves ~0.5-1s of dead time.
@@ -141,7 +143,7 @@ def stream_and_speak(messages, tools=None):
     cue_thread.start()
 
     buffer = ""
-    full_response = ""
+    raw_chunks = []       # exact text from Ollama for KV cache compatibility
     in_think = False
     think_content = ""
     tool_calls = None
@@ -151,6 +153,7 @@ def stream_and_speak(messages, tools=None):
             tool_calls = chunk["tool_calls"]
             break
 
+        raw_chunks.append(chunk["text"])
         buffer += chunk["text"]
 
         # -- Thinking tag handling --
@@ -158,12 +161,9 @@ def stream_and_speak(messages, tools=None):
             pre, _, post = buffer.partition("<think>")
             if pre.strip():
                 cue_thread.join()
-                remainder, spoken = _speak_sentences(pre)
-                full_response += spoken
+                remainder, _ = _speak_sentences(pre)
                 if remainder.strip():
                     speak(remainder.strip())
-                    full_response += (" " + remainder.strip()
-                                      ) if full_response else remainder.strip()
             in_think = True
             buffer = post
 
@@ -184,16 +184,20 @@ def stream_and_speak(messages, tools=None):
         if spoken:
             # Wait for the cue to finish before speaking real content
             cue_thread.join()
-            full_response += (" " + spoken) if full_response else spoken
 
     # Speak any remaining text in the buffer
     cue_thread.join()
     leftover = buffer.strip()
     if leftover and not in_think:
         speak(leftover)
-        full_response += (" " + leftover) if full_response else leftover
 
-    return full_response.strip(), tool_calls
+    # Build raw response preserving Ollama's exact whitespace, only strip
+    # think tags so the text matches the KV cache on the next turn.
+    raw_response = "".join(raw_chunks)
+    raw_response = re.sub(r"<think>.*?</think>", "",
+                          raw_response, flags=re.DOTALL).strip()
+
+    return raw_response, tool_calls
 
 
 def chat_with_ollama(user_text, conversation_history, jokes_db):
@@ -204,37 +208,40 @@ def chat_with_ollama(user_text, conversation_history, jokes_db):
     messages.extend(conversation_history)
     messages.append({"role": "user", "content": user_text})
 
-    full_response, tool_calls = stream_and_speak(messages, tools=TOOLS)
+    raw_response, tool_calls = stream_and_speak(messages, tools=TOOLS)
 
-    # Tool-call loop (max 3 rounds) — falls back to non-streaming
+    # Tool-call loop (max 3 rounds)
     end_conversation = False
+    tool_messages = []  # track intermediate tool messages for history
     for _ in range(3):
         if not tool_calls:
             break
 
-        messages.append({"role": "assistant", "content": "",
-                        "tool_calls": tool_calls})
+        tc_msg = {"role": "assistant", "content": "", "tool_calls": tool_calls}
+        messages.append(tc_msg)
+        tool_messages.append(tc_msg)
         for tc in tool_calls:
             fn_name = tc["function"]["name"]
             fn_args = tc["function"]["arguments"]
             if fn_name == "end_conversation":
                 end_conversation = True
             result = execute_tool(fn_name, fn_args, jokes_db)
-            messages.append({"role": "tool", "content": result})
+            tool_result_msg = {"role": "tool", "content": result}
+            messages.append(tool_result_msg)
+            tool_messages.append(tool_result_msg)
 
         # Stream the post-tool response too
-        full_response, tool_calls = stream_and_speak(messages, tools=TOOLS)
+        raw_response, tool_calls = stream_and_speak(messages, tools=TOOLS)
 
-    # Strip any residual thinking tags (safety net for tool-call path)
-    full_response = re.sub(r"<think>.*?</think>", "",
-                           full_response, flags=re.DOTALL).strip()
-
-    # Update conversation history
+    # Update conversation history — preserve exact messages so the Ollama
+    # KV cache prefix matches on the next turn.
     conversation_history.append({"role": "user", "content": user_text})
+    for msg in tool_messages:
+        conversation_history.append(msg)
     conversation_history.append(
-        {"role": "assistant", "content": full_response})
+        {"role": "assistant", "content": raw_response})
     max_msgs = CONFIG["context_turns"] * 2
     while len(conversation_history) > max_msgs:
         conversation_history.pop(0)
 
-    return full_response, end_conversation
+    return raw_response, end_conversation

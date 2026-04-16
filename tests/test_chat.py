@@ -222,12 +222,12 @@ class TestChatWithOllama:
         assert mock_sas.call_count == 2
 
     @mock.patch("pi_bot.chat.stream_and_speak")
-    def test_strips_residual_think_tags(self, mock_sas):
-        mock_sas.return_value = ("<think>stuff</think>Clean answer.", None)
+    def test_passes_through_clean_response(self, mock_sas):
+        # stream_and_speak already strips think tags before returning
+        mock_sas.return_value = ("Clean answer.", None)
         history = []
         result, end = chat_with_ollama("Hi", history, SAMPLE_JOKES)
-        assert "think" not in result
-        assert "Clean answer." in result
+        assert result == "Clean answer."
 
     @mock.patch("pi_bot.chat.stream_and_speak")
     def test_uses_german_prompt_when_configured(self, mock_sas):

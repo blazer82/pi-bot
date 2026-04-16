@@ -19,7 +19,7 @@ from pi_bot.audio import (
     record_until_silence,
     wait_for_followup,
 )
-from pi_bot.chat import chat_with_ollama
+from pi_bot.chat import chat_with_ollama, warmup_ollama
 
 # jokes.json lives in the repository root, one level above this file
 _REPO_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -37,6 +37,9 @@ def main():
 
     print("Calibrating noise floor...")
     calibrate_noise_floor()
+
+    print("Warming up Ollama...")
+    warmup_ollama()
 
     with open(os.path.join(_REPO_DIR, "jokes.json"), "r", encoding="utf-8") as f:
         jokes_db = json.load(f)
@@ -133,6 +136,9 @@ def chat_mode():
     print("Pi-Bot chat mode")
     print('Type messages to chat. "reset" clears history, "exit" quits.')
     print()
+
+    print("Warming up Ollama...")
+    warmup_ollama()
 
     ready_msg = "Pi Bot ist bereit." if CONFIG["language"] == "de" else "Pi Bot is ready."
     print(ready_msg)

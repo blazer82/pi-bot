@@ -3,7 +3,6 @@
 import json
 import re
 import threading
-from datetime import datetime
 
 import requests
 
@@ -23,6 +22,7 @@ def _ollama_chat_stream(messages, tools=None):
         "model": CONFIG["ollama_model"],
         "messages": messages,
         "stream": True,
+        "options": {"num_ctx": CONFIG["ollama_num_ctx"]},
     }
     if tools:
         payload["tools"] = tools
@@ -48,6 +48,41 @@ def _ollama_chat_stream(messages, tools=None):
             yield {"type": "content", "text": content}
         if chunk.get("done"):
             return
+
+
+def warmup_ollama():
+    """Send a minimal request to Ollama to pre-fill the KV cache.
+
+    Ollama caches the prompt prefix (system prompt + tool definitions) from the
+    last request.  By sending a cheap dummy request at startup, the first real
+    user query can skip the expensive prompt evaluation for that prefix.
+    """
+    system_prompt = SYSTEM_PROMPT_DE if CONFIG["language"] == "de" else SYSTEM_PROMPT_EN
+
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": "hi"},
+    ]
+    payload = {
+        "model": CONFIG["ollama_model"],
+        "messages": messages,
+        "tools": TOOLS,
+        "think": CONFIG["thinking"],
+        "stream": False,
+        "options": {"num_ctx": CONFIG["ollama_num_ctx"], "num_predict": 1},
+    }
+    try:
+        r = requests.post(
+            f"{CONFIG['ollama_url']}/api/chat",
+            json=payload,
+            timeout=60,
+        )
+        r.raise_for_status()
+        data = r.json()
+        prompt_tokens = data.get("prompt_eval_count", "?")
+        print(f"Ollama warmup done ({prompt_tokens} prompt tokens cached)")
+    except Exception as e:
+        print(f"Ollama warmup failed (non-fatal): {e}")
 
 
 _SENTENCE_BOUNDARY = re.compile(r"(?<=[.!?])\s+")
@@ -164,12 +199,6 @@ def stream_and_speak(messages, tools=None):
 def chat_with_ollama(user_text, conversation_history, jokes_db):
     """Send user message to ollama, handle tool calls, stream and speak."""
     system_prompt = SYSTEM_PROMPT_DE if CONFIG["language"] == "de" else SYSTEM_PROMPT_EN
-    now = datetime.now()
-    if CONFIG["language"] == "de":
-        days = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]
-        system_prompt += f"\n\nAktuelles Datum und Uhrzeit: {now:%Y-%m-%d %H:%M} {days[now.weekday()]}"
-    else:
-        system_prompt += f"\n\nCurrent date and time: {now:%Y-%m-%d %H:%M %A}"
 
     messages = [{"role": "system", "content": system_prompt}]
     messages.extend(conversation_history)

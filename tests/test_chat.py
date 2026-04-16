@@ -238,8 +238,7 @@ class TestChatWithOllama:
             history = []
             response, end = chat_with_ollama("Hallo", history, SAMPLE_JOKES)
             messages = mock_sas.call_args[0][0]
-            assert messages[0]["content"].startswith(SYSTEM_PROMPT_DE)
-            assert "Aktuelles Datum und Uhrzeit:" in messages[0]["content"]
+            assert messages[0]["content"] == SYSTEM_PROMPT_DE
         finally:
             CONFIG["language"] = original
 
@@ -267,7 +266,6 @@ class TestChatWithOllama:
             history = []
             response, end = chat_with_ollama("Hello", history, SAMPLE_JOKES)
             messages = mock_sas.call_args[0][0]
-            assert messages[0]["content"].startswith(SYSTEM_PROMPT_EN)
-            assert "Current date and time:" in messages[0]["content"]
+            assert messages[0]["content"] == SYSTEM_PROMPT_EN
         finally:
             CONFIG["language"] = original

@@ -4,11 +4,23 @@ import os
 import tempfile
 import wave
 
+import numpy as np
+
 from pi_bot.config import CONFIG
+
+
+def _normalize(audio):
+    """Peak-normalize int16 audio to use the full dynamic range."""
+    peak = np.max(np.abs(audio.astype(np.float32)))
+    if peak < 1:
+        return audio
+    gain = 32767.0 / peak
+    return np.clip(audio.astype(np.float32) * gain, -32768, 32767).astype(np.int16)
 
 
 def transcribe(whisper_model, audio_np):
     """Transcribe int16 numpy audio to text."""
+    audio_np = _normalize(audio_np)
     with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f:
         tmp_path = f.name
         with wave.open(f, "wb") as wf:

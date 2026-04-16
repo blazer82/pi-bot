@@ -48,21 +48,14 @@ fi
 export OMP_NUM_THREADS=4
 
 # -----------------------------------------------------------------------
-# 3. Download openWakeWord models
-# -----------------------------------------------------------------------
-echo ""
-echo "--- Downloading openWakeWord models ---"
-python3 -c "import openwakeword; openwakeword.utils.download_models()"
-
-# -----------------------------------------------------------------------
-# 4. Download whisper.cpp 'small' model
+# 3. Download whisper.cpp 'small' model
 # -----------------------------------------------------------------------
 echo ""
 echo "--- Pre-downloading whisper 'small' model (this may take a while) ---"
 python3 -c "from pywhispercpp.model import Model; Model('small')"
 
 # -----------------------------------------------------------------------
-# 5. Install ollama
+# 4. Install ollama
 # -----------------------------------------------------------------------
 echo ""
 echo "--- Installing ollama ---"
@@ -73,14 +66,14 @@ else
 fi
 
 # -----------------------------------------------------------------------
-# 6. Pull LLM model
+# 5. Pull LLM model
 # -----------------------------------------------------------------------
 echo ""
 echo "--- Pulling $OLLAMA_MODEL (this will take a while on first run) ---"
 ollama pull "$OLLAMA_MODEL"
 
 # -----------------------------------------------------------------------
-# 7. (Optional) Install MBROLA voices for smoother German TTS
+# 6. (Optional) Install MBROLA voices for smoother German TTS
 # -----------------------------------------------------------------------
 echo ""
 echo "--- Optional: MBROLA voices ---"
@@ -99,7 +92,7 @@ else
 fi
 
 # -----------------------------------------------------------------------
-# 8. Audio device check
+# 7. Audio device check
 # -----------------------------------------------------------------------
 echo ""
 echo "--- Detected audio devices ---"

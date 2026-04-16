@@ -18,7 +18,7 @@ source venv/bin/activate
 python3 pi_bot.py
 ```
 
-Say **"Hey Jarvis"** to activate, then speak your question. Pi-Bot responds via the speaker.
+Say **"Hey Pee Bot"** to activate, then speak your question. Pi-Bot responds via the speaker.
 
 To keep the Ollama model loaded in memory for faster responses, run:
 
@@ -35,7 +35,7 @@ Then type `/bye` to exit the interactive session — the model stays resident.
   → Ollama (Gemma 4) → Tool calls if needed → espeak-ng TTS → [Speaker]
 ```
 
-1. Continuously listens for the wake word ("Hey Jarvis")
+1. Continuously listens for the wake word ("Hey Pee Bot")
 2. On detection, plays an acknowledgment ("Ja?") and records until silence
 3. Transcribes speech with whisper.cpp (small model)
 4. Sends transcript to Gemma 4 via ollama, with tool definitions
@@ -46,21 +46,21 @@ Then type `/bye` to exit the interactive session — the model stays resident.
 
 Edit the `CONFIG` dict at the top of `pi_bot.py`:
 
-| Key                  | Default                  | Description                                  |
-| -------------------- | ------------------------ | -------------------------------------------- |
-| `language`           | `"de"`                   | `"de"` for German, `"en"` for English        |
-| `ollama_model`       | `"gemma4:e2b-it-q4_K_M"` | Ollama model tag                             |
-| `whisper_model`      | `"small"`                | Whisper model size (tiny/base/small/medium)  |
-| `wake_word`          | `"hey_jarvis"`           | openWakeWord model name                      |
-| `wake_threshold`     | `0.5`                    | Wake word confidence threshold (0.0-1.0)     |
-| `silence_threshold`  | `500`                    | RMS energy below this = silence              |
-| `silence_duration`   | `1.5`                    | Seconds of silence before stopping recording |
-| `max_record_seconds` | `15`                     | Maximum recording length                     |
-| `thinking`           | `False`                  | Enable `<think>` reasoning in ollama         |
-| `espeak_speed`       | `130`                    | Speech rate (words per minute)               |
-| `espeak_pitch`       | `40`                     | Pitch (0-99, lower = deeper)                 |
-| `mic_device`         | `None`                   | Microphone device index (None = default)     |
-| `speaker_device`     | `None`                   | Speaker device index (None = default)        |
+| Key                  | Default                     | Description                                  |
+| -------------------- | --------------------------- | -------------------------------------------- |
+| `language`           | `"de"`                      | `"de"` for German, `"en"` for English        |
+| `ollama_model`       | `"gemma4:e2b-it-q4_K_M"`    | Ollama model tag                             |
+| `whisper_model`      | `"small"`                   | Whisper model size (tiny/base/small/medium)  |
+| `wake_model`         | `"models/hey_pee_bot.onnx"` | Path to custom openWakeWord `.onnx` model    |
+| `wake_threshold`     | `0.5`                       | Wake word confidence threshold (0.0-1.0)     |
+| `silence_threshold`  | `500`                       | RMS energy below this = silence              |
+| `silence_duration`   | `1.5`                       | Seconds of silence before stopping recording |
+| `max_record_seconds` | `15`                        | Maximum recording length                     |
+| `thinking`           | `False`                     | Enable `<think>` reasoning in ollama         |
+| `espeak_speed`       | `130`                       | Speech rate (words per minute)               |
+| `espeak_pitch`       | `40`                        | Pitch (0-99, lower = deeper)                 |
+| `mic_device`         | `None`                      | Microphone device index (None = default)     |
+| `speaker_device`     | `None`                      | Speaker device index (None = default)        |
 
 ## USB Audio Setup
 

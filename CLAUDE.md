@@ -50,7 +50,7 @@ The root `pi_bot.py` is a thin shim that calls `pi_bot.main.cli()`.
 **Pipeline:** Mic -> Wake word detection -> Record until silence -> Whisper STT -> Ollama chat (streaming) -> Tool execution loop (up to 3 rounds) -> espeak-ng TTS -> Speaker
 
 **Key flow in `main()`:**
-1. `listen_for_wake_word()` blocks until "Hey Jarvis" is detected
+1. `listen_for_wake_word()` blocks until "Hey Pee Bot" is detected
 2. `record_until_silence()` captures the user's speech
 3. `transcribe()` converts audio to text via whisper.cpp
 4. `chat_with_ollama()` orchestrates the LLM conversation:

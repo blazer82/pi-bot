@@ -47,6 +47,14 @@ def _ollama_chat_stream(messages, tools=None):
         if content:
             yield {"type": "content", "text": content}
         if chunk.get("done"):
+            pe_count = chunk.get("prompt_eval_count", "?")
+            pe_dur = chunk.get("prompt_eval_duration", 0)
+            ev_count = chunk.get("eval_count", "?")
+            ev_dur = chunk.get("eval_duration", 0)
+            pe_sec = pe_dur / 1e9 if pe_dur else 0
+            ev_sec = ev_dur / 1e9 if ev_dur else 0
+            print(f"[Ollama] prompt: {pe_count} tokens in {pe_sec:.1f}s | "
+                  f"gen: {ev_count} tokens in {ev_sec:.1f}s")
             return
 
 

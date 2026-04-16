@@ -5,7 +5,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 VENV_DIR="$SCRIPT_DIR/venv"
-OLLAMA_MODEL="gemma4:e2b-it-q4_K_M"
+OLLAMA_MODEL="gemma4:e4b-it-q4_K_M"
 
 echo "=== Pi-Bot Setup ==="
 

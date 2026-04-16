@@ -23,7 +23,7 @@ Say **"Hey Pee Bot"** to activate, then speak your question. Pi-Bot responds via
 To keep the Ollama model loaded in memory for faster responses, run:
 
 ```bash
-ollama run gemma4:e2b-it-q4_K_M --keepalive "-1m"
+ollama run gemma4:e4b-it-q4_K_M --keepalive "-1m"
 ```
 
 Then type `/bye` to exit the interactive session — the model stays resident.
@@ -49,7 +49,7 @@ Edit the `CONFIG` dict at the top of `pi_bot.py`:
 | Key                  | Default                     | Description                                  |
 | -------------------- | --------------------------- | -------------------------------------------- |
 | `language`           | `"de"`                      | `"de"` for German, `"en"` for English        |
-| `ollama_model`       | `"gemma4:e2b-it-q4_K_M"`    | Ollama model tag                             |
+| `ollama_model`       | `"gemma4:e4b-it-q4_K_M"`    | Ollama model tag                             |
 | `whisper_model`      | `"base"`                    | Whisper model size (tiny/base/small/medium)  |
 | `wake_model`         | `"models/hey_pee_bot.onnx"` | Path to custom openWakeWord `.onnx` model    |
 | `wake_threshold`     | `0.5`                       | Wake word confidence threshold (0.0-1.0)     |
@@ -153,7 +153,7 @@ You can run Pi-Bot in text-input chat mode on a Mac, bypassing all microphone an
 ### Prerequisites
 
 - [Ollama](https://ollama.com/) installed and running (`ollama serve`)
-- An Ollama model pulled (e.g. `ollama pull gemma4:e2b-it-q4_K_M`)
+- An Ollama model pulled (e.g. `ollama pull gemma4:e4b-it-q4_K_M`)
 - espeak-ng: `brew install espeak-ng`
 
 ### Setup

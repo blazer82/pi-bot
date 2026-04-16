@@ -18,6 +18,12 @@ def _normalize(audio):
     return np.clip(audio.astype(np.float32) * gain, -32768, 32767).astype(np.int16)
 
 
+def warmup(whisper_model):
+    """Run a short silent transcription to warm up the model."""
+    silence = np.zeros(CONFIG["sample_rate"], dtype=np.int16)  # 1s of silence
+    transcribe(whisper_model, silence)
+
+
 def transcribe(whisper_model, audio_np):
     """Transcribe int16 numpy audio to text."""
     audio_np = _normalize(audio_np)

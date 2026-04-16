@@ -17,6 +17,7 @@ _WAKE_KEY = os.path.splitext(os.path.basename(CONFIG["wake_model"]))[0]
 
 def listen_for_wake_word(wake_model):
     """Block until the wake word is detected."""
+    wake_model.reset()
     chunk_size = 1280  # 80ms at 16kHz
     with sd.InputStream(
         samplerate=CONFIG["sample_rate"],

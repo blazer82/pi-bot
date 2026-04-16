@@ -12,7 +12,7 @@ except ImportError:
 
 from pi_bot.config import CONFIG
 from pi_bot.tts import speak
-from pi_bot.stt import transcribe
+from pi_bot.stt import transcribe, warmup
 from pi_bot.audio import listen_for_wake_word, record_until_silence, wait_for_followup
 from pi_bot.chat import chat_with_ollama
 
@@ -28,6 +28,7 @@ def main():
 
     print("Loading whisper model...")
     whisper_model = WhisperModel(CONFIG["whisper_model"])
+    warmup(whisper_model)
 
     with open(os.path.join(_REPO_DIR, "jokes.json"), "r", encoding="utf-8") as f:
         jokes_db = json.load(f)

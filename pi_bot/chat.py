@@ -25,8 +25,7 @@ def _ollama_chat_stream(messages, tools=None):
     }
     if tools:
         payload["tools"] = tools
-    if CONFIG["thinking"]:
-        payload["think"] = True
+    payload["think"] = CONFIG["thinking"]
     r = requests.post(
         f"{CONFIG['ollama_url']}/api/chat",
         json=payload,

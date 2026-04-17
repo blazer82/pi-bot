@@ -22,9 +22,10 @@ CONFIG = {
     "context_turns": 10,                    # keep last N user/assistant pairs
     "followup_timeout": 12,                 # seconds to wait for follow-up speech
     "thinking": False,                     # enable <think> reasoning in ollama
-    "piper_model": "de_DE-thorsten-high",
+    "piper_model": "de_DE-thorsten-medium",
     "piper_data_dir": os.path.join(_REPO_DIR, "models", "piper"),
-    "piper_speaker": None,                  # None = default, or int for multi-speaker models
+    # None = default, or int for multi-speaker models
+    "piper_speaker": None,
     "piper_length_scale": 1.0,              # >1.0 = slower, <1.0 = faster
     "mic_device": None,                     # None = default, or int device index
     "speaker_device": None,                 # None = default, or int device index

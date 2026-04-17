@@ -95,13 +95,13 @@ else
     echo "piper already installed: $(piper --version)"
 fi
 
-MODEL_FILE="$PIPER_DIR/de_DE-thorsten-high.onnx"
+MODEL_FILE="$PIPER_DIR/de_DE-thorsten-medium.onnx"
 if [ ! -f "$MODEL_FILE" ]; then
-    echo "Downloading de_DE-thorsten-high voice model..."
+    echo "Downloading de_DE-thorsten-medium voice model..."
     curl -fsSL -o "$MODEL_FILE" \
-        "https://huggingface.co/rhasspy/piper-voices/resolve/main/de/de_DE/thorsten/high/de_DE-thorsten-high.onnx"
+        "https://huggingface.co/rhasspy/piper-voices/resolve/main/de/de_DE/thorsten/medium/de_DE-thorsten-medium.onnx"
     curl -fsSL -o "${MODEL_FILE}.json" \
-        "https://huggingface.co/rhasspy/piper-voices/resolve/main/de/de_DE/thorsten/high/de_DE-thorsten-high.onnx.json"
+        "https://huggingface.co/rhasspy/piper-voices/resolve/main/de/de_DE/thorsten/medium/de_DE-thorsten-medium.onnx.json"
     echo "Voice model downloaded."
 else
     echo "Voice model already present."

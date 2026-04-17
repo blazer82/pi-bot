@@ -14,32 +14,32 @@ from pi_bot.config import CONFIG
 # Weather codes (WMO)
 # ---------------------------------------------------------------------------
 WMO_WEATHER_CODES = {
-    0: ("Klar", "Clear sky"),
-    1: ("Überwiegend klar", "Mainly clear"),
-    2: ("Teilweise bewölkt", "Partly cloudy"),
-    3: ("Bewölkt", "Overcast"),
-    45: ("Nebel", "Fog"),
-    48: ("Raunebel", "Depositing rime fog"),
-    51: ("Leichter Nieselregen", "Light drizzle"),
-    53: ("Mäßiger Nieselregen", "Moderate drizzle"),
-    55: ("Starker Nieselregen", "Dense drizzle"),
-    61: ("Leichter Regen", "Slight rain"),
-    63: ("Mäßiger Regen", "Moderate rain"),
-    65: ("Starker Regen", "Heavy rain"),
-    66: ("Leichter Gefrierregen", "Light freezing rain"),
-    67: ("Starker Gefrierregen", "Heavy freezing rain"),
-    71: ("Leichter Schneefall", "Slight snowfall"),
-    73: ("Mäßiger Schneefall", "Moderate snowfall"),
-    75: ("Starker Schneefall", "Heavy snowfall"),
-    77: ("Schneegriesel", "Snow grains"),
-    80: ("Leichte Regenschauer", "Slight rain showers"),
-    81: ("Mäßige Regenschauer", "Moderate rain showers"),
-    82: ("Heftige Regenschauer", "Violent rain showers"),
-    85: ("Leichte Schneeschauer", "Slight snow showers"),
-    86: ("Starke Schneeschauer", "Heavy snow showers"),
-    95: ("Gewitter", "Thunderstorm"),
-    96: ("Gewitter mit leichtem Hagel", "Thunderstorm with slight hail"),
-    99: ("Gewitter mit starkem Hagel", "Thunderstorm with heavy hail"),
+    0: "Klar",
+    1: "Überwiegend klar",
+    2: "Teilweise bewölkt",
+    3: "Bewölkt",
+    45: "Nebel",
+    48: "Raunebel",
+    51: "Leichter Nieselregen",
+    53: "Mäßiger Nieselregen",
+    55: "Starker Nieselregen",
+    61: "Leichter Regen",
+    63: "Mäßiger Regen",
+    65: "Starker Regen",
+    66: "Leichter Gefrierregen",
+    67: "Starker Gefrierregen",
+    71: "Leichter Schneefall",
+    73: "Mäßiger Schneefall",
+    75: "Starker Schneefall",
+    77: "Schneegriesel",
+    80: "Leichte Regenschauer",
+    81: "Mäßige Regenschauer",
+    82: "Heftige Regenschauer",
+    85: "Leichte Schneeschauer",
+    86: "Starke Schneeschauer",
+    95: "Gewitter",
+    96: "Gewitter mit leichtem Hagel",
+    99: "Gewitter mit starkem Hagel",
 }
 
 
@@ -63,11 +63,10 @@ def get_weather_forecast():
         return json.dumps({"error": f"Weather API error: {e}"}, ensure_ascii=False)
 
     daily = data.get("daily", {})
-    lang_idx = 0 if CONFIG["language"] == "de" else 1
     days = []
     for i in range(len(daily.get("time", []))):
         code = daily["weathercode"][i]
-        desc = WMO_WEATHER_CODES.get(code, ("Unbekannt", "Unknown"))[lang_idx]
+        desc = WMO_WEATHER_CODES.get(code, "Unbekannt")
         days.append({
             "date": daily["time"][i],
             "temp_max": daily["temperature_2m_max"][i],

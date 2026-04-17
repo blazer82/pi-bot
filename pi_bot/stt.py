@@ -94,7 +94,7 @@ def transcribe(whisper_model, audio_np):
     audio_f32 = _preprocess(audio_np)
     segments = whisper_model.transcribe(
         audio_f32,
-        language=CONFIG["language"],
+        language="de",
         n_threads=4,
         single_segment=True,
         no_context=True,

@@ -44,18 +44,10 @@ def main():
     with open(os.path.join(_REPO_DIR, "jokes.json"), "r", encoding="utf-8") as f:
         jokes_db = json.load(f)
 
-    no_hear = (
-        "Ich habe nichts verstanden."
-        if CONFIG["language"] == "de"
-        else "I didn't catch that."
-    )
-    err_msg = (
-        "Es gab einen Fehler."
-        if CONFIG["language"] == "de"
-        else "There was an error."
-    )
+    no_hear = "Ich habe nichts verstanden."
+    err_msg = "Es gab einen Fehler."
 
-    ready_msg = "Pi Bot ist bereit." if CONFIG["language"] == "de" else "Pi Bot is ready."
+    ready_msg = "Pi Bot ist bereit."
     print(ready_msg)
     speak(ready_msg)
 
@@ -68,7 +60,7 @@ def main():
             # Fresh conversation context per wake-word activation
             conversation_history = []
 
-            ack = "Ja?" if CONFIG["language"] == "de" else "Yes?"
+            ack = "Ja?"
             speak(ack)
 
             # --- First utterance ---
@@ -140,7 +132,7 @@ def chat_mode():
     print("Warming up Ollama...")
     warmup_ollama()
 
-    ready_msg = "Pi Bot ist bereit." if CONFIG["language"] == "de" else "Pi Bot is ready."
+    ready_msg = "Pi Bot ist bereit."
     print(ready_msg)
     speak(ready_msg)
 

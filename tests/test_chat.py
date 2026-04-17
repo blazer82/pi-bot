@@ -4,7 +4,7 @@ import json
 from unittest import mock
 
 from tests.conftest import SAMPLE_JOKES
-from pi_bot.config import CONFIG, TOOLS, SYSTEM_PROMPT_DE, SYSTEM_PROMPT_EN
+from pi_bot.config import CONFIG, TOOLS, SYSTEM_PROMPT_DE
 from pi_bot.chat import (
     _ollama_chat_stream,
     _speak_sentences,
@@ -153,17 +153,12 @@ class TestStreamAndSpeak:
     @mock.patch("pi_bot.chat.speak")
     @mock.patch("pi_bot.chat._ollama_chat_stream")
     def test_think_tag_speaks_cue(self, mock_stream, mock_speak):
-        original_lang = CONFIG["language"]
-        try:
-            CONFIG["language"] = "de"
-            mock_stream.return_value = iter([
-                {"type": "content", "text": "<think>thinking</think>Answer."},
-            ])
-            stream_and_speak([])
-            spoken_texts = [call[0][0] for call in mock_speak.call_args_list]
-            assert any("Moment" in t for t in spoken_texts)
-        finally:
-            CONFIG["language"] = original_lang
+        mock_stream.return_value = iter([
+            {"type": "content", "text": "<think>thinking</think>Answer."},
+        ])
+        stream_and_speak([])
+        spoken_texts = [call[0][0] for call in mock_speak.call_args_list]
+        assert any("Moment" in t for t in spoken_texts)
 
 
 class TestChatWithOllama:
@@ -230,17 +225,12 @@ class TestChatWithOllama:
         assert result == "Clean answer."
 
     @mock.patch("pi_bot.chat.stream_and_speak")
-    def test_uses_german_prompt_when_configured(self, mock_sas):
+    def test_uses_german_prompt(self, mock_sas):
         mock_sas.return_value = ("Antwort.", None)
-        original = CONFIG["language"]
-        try:
-            CONFIG["language"] = "de"
-            history = []
-            response, end = chat_with_ollama("Hallo", history, SAMPLE_JOKES)
-            messages = mock_sas.call_args[0][0]
-            assert messages[0]["content"] == SYSTEM_PROMPT_DE
-        finally:
-            CONFIG["language"] = original
+        history = []
+        response, end = chat_with_ollama("Hallo", history, SAMPLE_JOKES)
+        messages = mock_sas.call_args[0][0]
+        assert messages[0]["content"] == SYSTEM_PROMPT_DE
 
     @mock.patch("pi_bot.chat.execute_tool")
     @mock.patch("pi_bot.chat.stream_and_speak")
@@ -257,15 +247,3 @@ class TestChatWithOllama:
         assert end is True
         assert result == "Goodbye!"
 
-    @mock.patch("pi_bot.chat.stream_and_speak")
-    def test_uses_english_prompt_when_configured(self, mock_sas):
-        mock_sas.return_value = ("Answer.", None)
-        original = CONFIG["language"]
-        try:
-            CONFIG["language"] = "en"
-            history = []
-            response, end = chat_with_ollama("Hello", history, SAMPLE_JOKES)
-            messages = mock_sas.call_args[0][0]
-            assert messages[0]["content"] == SYSTEM_PROMPT_EN
-        finally:
-            CONFIG["language"] = original

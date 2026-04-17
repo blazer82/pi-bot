@@ -6,7 +6,7 @@ import threading
 
 import requests
 
-from pi_bot.config import CONFIG, TOOLS, SYSTEM_PROMPT_DE, SYSTEM_PROMPT_EN
+from pi_bot.config import CONFIG, TOOLS, SYSTEM_PROMPT_DE
 from pi_bot.tts import speak
 from pi_bot.tools import execute_tool
 
@@ -65,10 +65,8 @@ def warmup_ollama():
     last request.  By sending a cheap dummy request at startup, the first real
     user query can skip the expensive prompt evaluation for that prefix.
     """
-    system_prompt = SYSTEM_PROMPT_DE if CONFIG["language"] == "de" else SYSTEM_PROMPT_EN
-
     messages = [
-        {"role": "system", "content": system_prompt},
+        {"role": "system", "content": SYSTEM_PROMPT_DE},
         {"role": "user", "content": "hi"},
     ]
     payload = {
@@ -150,11 +148,9 @@ def stream_and_speak(messages, tools=None, slow_start=False):
     # Speak the cue in a background thread so the Ollama request starts
     # immediately — saves ~0.5-1s of dead time.
     if slow_start:
-        cue = ("Moment, ich muss kurz meine Gedanken sortieren. Bin gleich da."
-               if CONFIG["language"] == "de"
-               else "Let me think about that for a moment...")
+        cue = "Moment, ich muss kurz meine Gedanken sortieren. Bin gleich da."
     else:
-        cue = "Moment..." if CONFIG["language"] == "de" else "Analysing..."
+        cue = "Moment..."
     cue_thread = threading.Thread(target=speak, args=(cue,), daemon=True)
     cue_thread.start()
 
@@ -218,8 +214,6 @@ def stream_and_speak(messages, tools=None, slow_start=False):
 
 def chat_with_ollama(user_text, conversation_history, jokes_db):
     """Send user message to ollama, handle tool calls, stream and speak."""
-    system_prompt = SYSTEM_PROMPT_DE if CONFIG["language"] == "de" else SYSTEM_PROMPT_EN
-
     # Trim history BEFORE building messages.  Instead of popping one pair
     # every turn (which shifts the prefix and invalidates Ollama's KV cache
     # every time), we trim in one batch — dropping to half the limit.  This
@@ -231,7 +225,7 @@ def chat_with_ollama(user_text, conversation_history, jokes_db):
         keep = keep - (keep % 2)  # ensure we keep full pairs
         conversation_history[:] = conversation_history[-keep:]
 
-    messages = [{"role": "system", "content": system_prompt}]
+    messages = [{"role": "system", "content": SYSTEM_PROMPT_DE}]
     messages.extend(conversation_history)
     messages.append({"role": "user", "content": user_text})
 

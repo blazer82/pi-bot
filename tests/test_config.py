@@ -9,8 +9,8 @@ class TestConfig:
             "ollama_model", "ollama_url", "whisper_model",
             "wake_model", "wake_threshold", "silence_threshold",
             "silence_duration", "max_record_seconds", "sample_rate",
-            "context_turns", "followup_timeout", "espeak_voice", "espeak_speed",
-            "espeak_pitch", "mic_device", "speaker_device",
+            "context_turns", "followup_timeout", "piper_model", "piper_data_dir",
+            "piper_length_scale", "mic_device", "speaker_device",
         ]
         for key in required:
             assert key in CONFIG, f"Missing config key: {key}"

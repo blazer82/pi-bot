@@ -11,7 +11,7 @@ except ImportError:
     WhisperModel = None
 
 from pi_bot.config import CONFIG
-from pi_bot.tts import speak
+from pi_bot.tts import speak, _check_piper
 from pi_bot.stt import transcribe, warmup
 from pi_bot.audio import (
     calibrate_noise_floor,
@@ -46,6 +46,8 @@ def main():
 
     no_hear = "Ich habe nichts verstanden."
     err_msg = "Es gab einen Fehler."
+
+    _check_piper()
 
     ready_msg = "Pi Bot ist bereit."
     print(ready_msg)
@@ -131,6 +133,8 @@ def chat_mode():
 
     print("Warming up Ollama...")
     warmup_ollama()
+
+    _check_piper()
 
     ready_msg = "Pi Bot ist bereit."
     print(ready_msg)

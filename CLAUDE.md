@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Pi-Bot is a voice-activated conversational robot for Raspberry Pi 5. It uses openWakeWord for wake word detection, whisper.cpp for STT, Ollama (Gemma 4) for LLM inference with tool calling, and espeak-ng for TTS. German only.
+Pi-Bot is a voice-activated conversational robot for Raspberry Pi 5. It uses openWakeWord for wake word detection, whisper.cpp for STT, Ollama (Gemma 4) for LLM inference with tool calling, and Piper TTS for TTS. German only.
 
 ## Commands
 
@@ -37,7 +37,7 @@ The application is structured as the `pi_bot/` package with focused modules:
 ```
 pi_bot/
   config.py   — CONFIG dict, system prompt (DE), TOOLS definitions
-  tts.py      — speak() via espeak-ng
+  tts.py      — speak() via Piper TTS
   stt.py      — transcribe() via whisper.cpp
   audio.py    — listen_for_wake_word(), record_until_silence(), wait_for_followup()
   tools.py    — tool implementations (weather, system status, jokes) + execute_tool() dispatcher
@@ -47,7 +47,7 @@ pi_bot/
 
 The root `pi_bot.py` is a thin shim that calls `pi_bot.main.cli()`.
 
-**Pipeline:** Mic -> Wake word detection -> Record until silence -> Whisper STT -> Ollama chat (streaming) -> Tool execution loop (up to 3 rounds) -> espeak-ng TTS -> Speaker
+**Pipeline:** Mic -> Wake word detection -> Record until silence -> Whisper STT -> Ollama chat (streaming) -> Tool execution loop (up to 3 rounds) -> Piper TTS -> Speaker
 
 **Key flow in `main()`:**
 1. `listen_for_wake_word()` blocks until "Hey Pee Bot" is detected

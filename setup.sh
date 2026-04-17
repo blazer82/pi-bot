@@ -15,7 +15,7 @@ echo "=== Pi-Bot Setup ==="
 echo ""
 echo "--- Installing system packages ---"
 sudo apt update
-sudo apt install -y espeak-ng python3-pip python3-venv cmake build-essential \
+sudo apt install -y python3-pip python3-venv cmake build-essential \
     libportaudio2 libsndfile1 \
     pipewire pipewire-pulse pipewire-alsa wireplumber alsa-utils
 
@@ -73,12 +73,39 @@ echo "--- Pulling $OLLAMA_MODEL (this will take a while on first run) ---"
 ollama pull "$OLLAMA_MODEL"
 
 # -----------------------------------------------------------------------
-# 6. Install MBROLA voices for smoother German TTS
+# 6. Install Piper TTS and German voice model
 # -----------------------------------------------------------------------
 echo ""
-echo "--- Installing MBROLA German voices ---"
-sudo apt install -y mbrola mbrola-de1 mbrola-de2 mbrola-de3 mbrola-de4 \
-    mbrola-de5 mbrola-de6 mbrola-de7 mbrola-de8
+echo "--- Installing Piper TTS ---"
+PIPER_VERSION="2023.11.14-2"
+PIPER_DIR="$SCRIPT_DIR/models/piper"
+mkdir -p "$PIPER_DIR"
+
+if ! command -v piper &>/dev/null; then
+    ARCH=$(dpkg --print-architecture)
+    PIPER_URL="https://github.com/rhasspy/piper/releases/download/${PIPER_VERSION}/piper_linux_${ARCH}.tar.gz"
+    echo "Downloading piper from $PIPER_URL"
+    curl -fsSL "$PIPER_URL" | tar -xz -C /tmp
+    sudo cp /tmp/piper/piper /usr/local/bin/
+    sudo cp /tmp/piper/lib*.so* /usr/local/lib/ 2>/dev/null || true
+    sudo ldconfig
+    rm -rf /tmp/piper
+    echo "piper installed: $(piper --version)"
+else
+    echo "piper already installed: $(piper --version)"
+fi
+
+MODEL_FILE="$PIPER_DIR/de_DE-thorsten-high.onnx"
+if [ ! -f "$MODEL_FILE" ]; then
+    echo "Downloading de_DE-thorsten-high voice model..."
+    curl -fsSL -o "$MODEL_FILE" \
+        "https://huggingface.co/rhasspy/piper-voices/resolve/main/de/de_DE/thorsten/high/de_DE-thorsten-high.onnx"
+    curl -fsSL -o "${MODEL_FILE}.json" \
+        "https://huggingface.co/rhasspy/piper-voices/resolve/main/de/de_DE/thorsten/high/de_DE-thorsten-high.onnx.json"
+    echo "Voice model downloaded."
+else
+    echo "Voice model already present."
+fi
 
 # -----------------------------------------------------------------------
 # 7. Audio device check

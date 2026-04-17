@@ -1,48 +1,86 @@
-"""Tests for text-to-speech."""
+"""Tests for text-to-speech (Piper TTS)."""
 
+import io
+import struct
+import wave
 from unittest import mock
 
+import pytest
+
 from pi_bot.config import CONFIG
-from pi_bot.tts import speak
+from pi_bot.tts import speak, _check_piper
+
+
+def _make_wav(n_frames=100, sample_rate=22050):
+    """Create minimal WAV bytes for testing."""
+    buf = io.BytesIO()
+    with wave.open(buf, "wb") as wf:
+        wf.setnchannels(1)
+        wf.setsampwidth(2)
+        wf.setframerate(sample_rate)
+        wf.writeframes(struct.pack(f"<{n_frames}h", *([0] * n_frames)))
+    return buf.getvalue()
 
 
 class TestSpeak:
+    @mock.patch("pi_bot.tts.sd")
     @mock.patch("pi_bot.tts.subprocess.run")
-    def test_calls_espeak_with_correct_args(self, mock_run):
-        speak("Hello world")
-        mock_run.assert_called_once()
+    def test_calls_piper_with_correct_model(self, mock_run, mock_sd):
+        mock_run.return_value = mock.MagicMock(stdout=_make_wav())
+        speak("Hallo Welt")
+
         cmd = mock_run.call_args[0][0]
-        assert cmd[0] == "espeak-ng"
-        assert "Hello world" in cmd
-        assert "-v" in cmd
-        assert "-s" in cmd
-        assert "-p" in cmd
+        assert cmd[0] == "piper"
+        model_idx = cmd.index("--model") + 1
+        assert cmd[model_idx] == CONFIG["piper_model"]
 
+    @mock.patch("pi_bot.tts.sd")
     @mock.patch("pi_bot.tts.subprocess.run")
-    def test_uses_config_voice(self, mock_run):
-        original = CONFIG["espeak_voice"]
+    def test_sends_text_as_stdin(self, mock_run, mock_sd):
+        mock_run.return_value = mock.MagicMock(stdout=_make_wav())
+        speak("Hallo Welt")
+
+        assert mock_run.call_args[1]["input"] == b"Hallo Welt"
+
+    @mock.patch("pi_bot.tts.sd")
+    @mock.patch("pi_bot.tts.subprocess.run")
+    def test_uses_config_length_scale(self, mock_run, mock_sd):
+        mock_run.return_value = mock.MagicMock(stdout=_make_wav())
+        original = CONFIG["piper_length_scale"]
         try:
-            CONFIG["espeak_voice"] = "mb-de4"
+            CONFIG["piper_length_scale"] = 1.3
             speak("test")
             cmd = mock_run.call_args[0][0]
-            voice_idx = cmd.index("-v") + 1
-            assert cmd[voice_idx] == "mb-de4"
+            scale_idx = cmd.index("--length-scale") + 1
+            assert cmd[scale_idx] == "1.3"
         finally:
-            CONFIG["espeak_voice"] = original
+            CONFIG["piper_length_scale"] = original
 
+    @mock.patch("pi_bot.tts.sd")
     @mock.patch("pi_bot.tts.subprocess.run")
-    def test_uses_config_speed_and_pitch(self, mock_run):
-        original_speed = CONFIG["espeak_speed"]
-        original_pitch = CONFIG["espeak_pitch"]
-        try:
-            CONFIG["espeak_speed"] = 200
-            CONFIG["espeak_pitch"] = 80
+    def test_plays_audio_via_sounddevice(self, mock_run, mock_sd):
+        mock_run.return_value = mock.MagicMock(stdout=_make_wav(sample_rate=22050))
+        speak("test")
+
+        mock_sd.play.assert_called_once()
+        mock_sd.wait.assert_called_once()
+        _, kwargs = mock_sd.play.call_args
+        assert kwargs["samplerate"] == 22050
+
+    @mock.patch("pi_bot.tts.sd")
+    @mock.patch("pi_bot.tts.subprocess.run")
+    def test_raises_on_piper_failure(self, mock_run, mock_sd):
+        mock_run.side_effect = Exception("piper failed")
+        with pytest.raises(Exception):
             speak("test")
-            cmd = mock_run.call_args[0][0]
-            speed_idx = cmd.index("-s") + 1
-            pitch_idx = cmd.index("-p") + 1
-            assert cmd[speed_idx] == "200"
-            assert cmd[pitch_idx] == "80"
-        finally:
-            CONFIG["espeak_speed"] = original_speed
-            CONFIG["espeak_pitch"] = original_pitch
+
+
+class TestCheckPiper:
+    @mock.patch("pi_bot.tts.shutil.which", return_value="/usr/local/bin/piper")
+    def test_passes_when_piper_found(self, mock_which):
+        _check_piper()
+
+    @mock.patch("pi_bot.tts.shutil.which", return_value=None)
+    def test_raises_when_piper_missing(self, mock_which):
+        with pytest.raises(RuntimeError, match="piper binary not found"):
+            _check_piper()

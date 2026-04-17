@@ -7,46 +7,39 @@ from tests.conftest import SAMPLE_JOKES
 from pi_bot.config import CONFIG, TOOLS, SYSTEM_PROMPT_DE
 from pi_bot.chat import (
     _ollama_chat_stream,
-    _speak_sentences,
+    _split_sentences,
     stream_and_speak,
     chat_with_ollama,
 )
 
 
-class TestSpeakSentences:
-    @mock.patch("pi_bot.chat.speak")
-    def test_no_complete_sentence(self, mock_speak):
-        remainder, spoken = _speak_sentences("Hello world")
+class TestSplitSentences:
+    def test_no_complete_sentence(self):
+        remainder, parts = _split_sentences("Hello world")
         assert remainder == "Hello world"
-        assert spoken == ""
-        mock_speak.assert_not_called()
+        assert parts == []
 
-    @mock.patch("pi_bot.chat.speak")
-    def test_one_complete_sentence(self, mock_speak):
-        remainder, spoken = _speak_sentences("Hello world. How are")
+    def test_one_complete_sentence(self):
+        remainder, parts = _split_sentences("Hello world. How are")
         assert remainder == "How are"
-        assert "Hello world." in spoken
-        mock_speak.assert_called_once_with("Hello world.")
+        assert parts == ["Hello world."]
 
-    @mock.patch("pi_bot.chat.speak")
-    def test_multiple_sentences(self, mock_speak):
-        remainder, spoken = _speak_sentences(
+    def test_multiple_sentences(self):
+        remainder, parts = _split_sentences(
             "First. Second! Third? Partial"
         )
         assert remainder == "Partial"
-        assert mock_speak.call_count == 3
+        assert len(parts) == 3
 
-    @mock.patch("pi_bot.chat.speak")
-    def test_question_mark_boundary(self, mock_speak):
-        remainder, spoken = _speak_sentences("Really? Yes")
+    def test_question_mark_boundary(self):
+        remainder, parts = _split_sentences("Really? Yes")
         assert remainder == "Yes"
-        mock_speak.assert_called_once_with("Really?")
+        assert parts == ["Really?"]
 
-    @mock.patch("pi_bot.chat.speak")
-    def test_exclamation_boundary(self, mock_speak):
-        remainder, spoken = _speak_sentences("Wow! Cool")
+    def test_exclamation_boundary(self):
+        remainder, parts = _split_sentences("Wow! Cool")
         assert remainder == "Cool"
-        mock_speak.assert_called_once_with("Wow!")
+        assert parts == ["Wow!"]
 
 
 class TestOllamaChatStream:

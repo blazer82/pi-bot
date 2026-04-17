@@ -98,40 +98,24 @@ _CLAUSE_BOUNDARY = re.compile(r"(?<=[,;:\u2014])\s+")
 _BUFFER_CHAR_LIMIT = 120
 
 
-def _speak_sentences(buffer):
-    """Speak every complete sentence or clause in *buffer*.
+def _split_sentences(buffer):
+    """Split complete sentences or clauses from *buffer*.
 
-    Splits on sentence endings (.!?) first.  If no sentence boundary is found
-    but the buffer exceeds ``_BUFFER_CHAR_LIMIT`` characters, falls back to
-    clause boundaries (,;:—) to keep latency low.
-
-    Returns ``(remainder, spoken_text)`` where *remainder* is the trailing
-    fragment that has not been spoken yet.
+    Returns ``(remainder, parts_to_speak)`` where *parts_to_speak* is a list
+    of strings ready to be spoken and *remainder* is the trailing fragment.
     """
-    # Try sentence boundaries first
     parts = _SENTENCE_BOUNDARY.split(buffer)
     if len(parts) > 1:
-        spoken = ""
-        for sentence in parts[:-1]:
-            s = sentence.strip()
-            if s:
-                speak(s)
-                spoken += s + " "
-        return parts[-1], spoken.strip()
+        to_speak = [s.strip() for s in parts[:-1] if s.strip()]
+        return parts[-1], to_speak
 
-    # Fall back to clause boundaries when the buffer is getting long
     if len(buffer) > _BUFFER_CHAR_LIMIT:
         parts = _CLAUSE_BOUNDARY.split(buffer)
         if len(parts) > 1:
-            spoken = ""
-            for clause in parts[:-1]:
-                s = clause.strip()
-                if s:
-                    speak(s)
-                    spoken += s + " "
-            return parts[-1], spoken.strip()
+            to_speak = [s.strip() for s in parts[:-1] if s.strip()]
+            return parts[-1], to_speak
 
-    return buffer, ""
+    return buffer, []
 
 
 def stream_and_speak(messages, tools=None):
@@ -164,7 +148,9 @@ def stream_and_speak(messages, tools=None):
             pre, _, post = buffer.partition("<think>")
             if pre.strip():
                 stop_loop()
-                remainder, _ = _speak_sentences(pre)
+                remainder, parts = _split_sentences(pre)
+                for p in parts:
+                    speak(p)
                 if remainder.strip():
                     speak(remainder.strip())
             in_think = True
@@ -183,10 +169,11 @@ def stream_and_speak(messages, tools=None):
                 continue
 
         # -- Sentence-by-sentence speaking --
-        buffer, spoken = _speak_sentences(buffer)
-        if spoken:
-            # Wait for the cue to finish before speaking real content
+        buffer, parts = _split_sentences(buffer)
+        if parts:
             stop_loop()
+            for p in parts:
+                speak(p)
 
     # Speak any remaining text in the buffer
     stop_loop()
@@ -220,6 +207,7 @@ def chat_with_ollama(user_text, conversation_history, jokes_db):
     messages.extend(conversation_history)
     messages.append({"role": "user", "content": user_text})
 
+    play_cue("ack")
     raw_response, tool_calls = stream_and_speak(
         messages, tools=TOOLS)
 

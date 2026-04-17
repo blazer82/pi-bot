@@ -14,7 +14,7 @@ from pi_bot.tools import (
 from pi_bot.chat import (
     _ollama_chat_stream,
     _SENTENCE_BOUNDARY,
-    _speak_sentences,
+    _split_sentences,
     stream_and_speak,
     chat_with_ollama,
 )

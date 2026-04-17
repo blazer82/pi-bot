@@ -20,6 +20,7 @@ from pi_bot.audio import (
     wait_for_followup,
 )
 from pi_bot.chat import chat_with_ollama, warmup_ollama
+from pi_bot.cues import play as play_cue
 
 # jokes.json lives in the repository root, one level above this file
 _REPO_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -62,8 +63,7 @@ def main():
             # Fresh conversation context per wake-word activation
             conversation_history = []
 
-            ack = "Ja?"
-            speak(ack)
+            play_cue("ack")
 
             # --- First utterance ---
             print("Recording...")
@@ -119,6 +119,7 @@ def main():
             break
         except Exception as e:
             print(f"Error: {e}")
+            play_cue("error")
             speak(err_msg)
 
 

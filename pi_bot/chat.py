@@ -2,13 +2,13 @@
 
 import json
 import re
-import threading
 
 import requests
 
 from pi_bot.config import CONFIG, TOOLS, SYSTEM_PROMPT_DE
 from pi_bot.tts import speak
 from pi_bot.tools import execute_tool
+from pi_bot.cues import play as play_cue, start_loop, stop_loop
 
 
 def _ollama_chat_stream(messages, tools=None):
@@ -134,25 +134,15 @@ def _speak_sentences(buffer):
     return buffer, ""
 
 
-def stream_and_speak(messages, tools=None, slow_start=False):
+def stream_and_speak(messages, tools=None):
     """Stream an Ollama response, handle ``<think>`` tags, and speak
     sentence-by-sentence as tokens arrive.
 
     Returns ``(raw_response_text, tool_calls_or_None)``.
     The raw response preserves Ollama's exact text (minus think tags) so that
     the conversation history matches the KV cache prefix on the next turn.
-
-    When *slow_start* is True (KV cache miss expected), a longer cue is spoken
-    to set expectations.
     """
-    # Speak the cue in a background thread so the Ollama request starts
-    # immediately — saves ~0.5-1s of dead time.
-    if slow_start:
-        cue = "Moment, ich muss kurz meine Gedanken sortieren. Bin gleich da."
-    else:
-        cue = "Moment..."
-    cue_thread = threading.Thread(target=speak, args=(cue,), daemon=True)
-    cue_thread.start()
+    start_loop("thinking")
 
     buffer = ""
     raw_chunks = []       # exact text from Ollama for KV cache compatibility
@@ -162,6 +152,7 @@ def stream_and_speak(messages, tools=None, slow_start=False):
 
     for chunk in _ollama_chat_stream(messages, tools=tools):
         if chunk["type"] == "tool_calls":
+            stop_loop()
             tool_calls = chunk["tool_calls"]
             break
 
@@ -172,7 +163,7 @@ def stream_and_speak(messages, tools=None, slow_start=False):
         if not in_think and "<think>" in buffer:
             pre, _, post = buffer.partition("<think>")
             if pre.strip():
-                cue_thread.join()
+                stop_loop()
                 remainder, _ = _speak_sentences(pre)
                 if remainder.strip():
                     speak(remainder.strip())
@@ -195,10 +186,10 @@ def stream_and_speak(messages, tools=None, slow_start=False):
         buffer, spoken = _speak_sentences(buffer)
         if spoken:
             # Wait for the cue to finish before speaking real content
-            cue_thread.join()
+            stop_loop()
 
     # Speak any remaining text in the buffer
-    cue_thread.join()
+    stop_loop()
     leftover = buffer.strip()
     if leftover and not in_think:
         speak(leftover)
@@ -230,7 +221,7 @@ def chat_with_ollama(user_text, conversation_history, jokes_db):
     messages.append({"role": "user", "content": user_text})
 
     raw_response, tool_calls = stream_and_speak(
-        messages, tools=TOOLS, slow_start=cache_miss)
+        messages, tools=TOOLS)
 
     # Tool-call loop (max 3 rounds)
     end_conversation = False
@@ -247,13 +238,17 @@ def chat_with_ollama(user_text, conversation_history, jokes_db):
             fn_args = tc["function"]["arguments"]
             if fn_name == "end_conversation":
                 end_conversation = True
+            play_cue("tool_start")
             result = execute_tool(fn_name, fn_args, jokes_db)
+            play_cue("tool_done")
             tool_result_msg = {"role": "tool", "content": result}
             messages.append(tool_result_msg)
             tool_messages.append(tool_result_msg)
 
         # Stream the post-tool response too
         raw_response, tool_calls = stream_and_speak(messages, tools=TOOLS)
+
+    play_cue("done")
 
     # Append to history — no trimming here, trim happens at the start of
     # the next call so the prefix stays stable between turns.

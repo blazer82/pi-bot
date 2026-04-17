@@ -29,6 +29,7 @@ CONFIG = {
     "piper_length_scale": 1.0,              # >1.0 = slower, <1.0 = faster
     "mic_device": None,                     # None = default, or int device index
     "speaker_device": None,                 # None = default, or int device index
+    "sounds_dir": os.path.join(_REPO_DIR, "sounds"),
     "location_name": "Frankfurt am Main",
     "location_lat": 50.1109,
     "location_lon": 8.6821,

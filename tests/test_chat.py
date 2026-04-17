@@ -151,14 +151,16 @@ class TestStreamAndSpeak:
         assert "Visible answer." in response
 
     @mock.patch("pi_bot.chat.speak")
+    @mock.patch("pi_bot.chat.stop_loop")
+    @mock.patch("pi_bot.chat.start_loop")
     @mock.patch("pi_bot.chat._ollama_chat_stream")
-    def test_think_tag_speaks_cue(self, mock_stream, mock_speak):
+    def test_think_tag_starts_thinking_cue(self, mock_stream, mock_start,
+                                           mock_stop, mock_speak):
         mock_stream.return_value = iter([
             {"type": "content", "text": "<think>thinking</think>Answer."},
         ])
         stream_and_speak([])
-        spoken_texts = [call[0][0] for call in mock_speak.call_args_list]
-        assert any("Moment" in t for t in spoken_texts)
+        mock_start.assert_called_once_with("thinking")
 
 
 class TestChatWithOllama:

@@ -1,2 +1,2 @@
 FROM gemma4:e4b-it-q4_K_M
-PARAMETER num_ctx 2048
+PARAMETER num_ctx 4096

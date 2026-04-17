@@ -11,7 +11,7 @@ CONFIG = {
     "ollama_model": "gemma4:e4b-it-q4_K_M",
     "ollama_url": "http://localhost:11434",
     # context window size (lower = faster prompt eval)
-    "ollama_num_ctx": 2048,
+    "ollama_num_ctx": 4096,
     "whisper_model": "base",                # tiny, base, small, medium
     "wake_model": os.path.join(_REPO_DIR, "models", "hey_pee_bot.onnx"),
     "wake_threshold": 0.5,                  # 0.0–1.0
@@ -19,7 +19,7 @@ CONFIG = {
     "silence_duration": 1.5,                # seconds of silence to stop recording
     "max_record_seconds": 15,               # safety cap
     "sample_rate": 16000,
-    "context_turns": 5,                    # keep last N user/assistant pairs
+    "context_turns": 10,                    # keep last N user/assistant pairs
     "followup_timeout": 12,                 # seconds to wait for follow-up speech
     "thinking": False,                     # enable <think> reasoning in ollama
     # MBROLA voice (e.g. mb-de4) or espeak lang

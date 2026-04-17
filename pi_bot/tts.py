@@ -21,10 +21,13 @@ def _check_piper():
 
 def speak(text):
     """Speak text via Piper TTS. Blocks until playback finishes."""
+    import os
+    model_path = os.path.join(
+        CONFIG["piper_data_dir"], CONFIG["piper_model"] + ".onnx"
+    )
     cmd = [
         "piper",
-        "--model", CONFIG["piper_model"],
-        "--data-dir", CONFIG["piper_data_dir"],
+        "--model", model_path,
         "--length-scale", str(CONFIG["piper_length_scale"]),
         "--output_file", "-",
     ]

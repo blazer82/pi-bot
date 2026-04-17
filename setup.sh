@@ -82,7 +82,7 @@ PIPER_DIR="$SCRIPT_DIR/models/piper"
 mkdir -p "$PIPER_DIR"
 
 if ! command -v piper &>/dev/null; then
-    ARCH=$(dpkg --print-architecture)
+    ARCH=$(uname -m)  # aarch64 on Pi 5
     PIPER_URL="https://github.com/rhasspy/piper/releases/download/${PIPER_VERSION}/piper_linux_${ARCH}.tar.gz"
     echo "Downloading piper from $PIPER_URL"
     curl -fsSL "$PIPER_URL" | tar -xz -C /tmp

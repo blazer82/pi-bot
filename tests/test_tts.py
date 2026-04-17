@@ -1,6 +1,7 @@
 """Tests for text-to-speech (Piper TTS)."""
 
 import io
+import os
 import struct
 import wave
 from unittest import mock
@@ -32,7 +33,8 @@ class TestSpeak:
         cmd = mock_run.call_args[0][0]
         assert cmd[0] == "piper"
         model_idx = cmd.index("--model") + 1
-        assert cmd[model_idx] == CONFIG["piper_model"]
+        expected = os.path.join(CONFIG["piper_data_dir"], CONFIG["piper_model"] + ".onnx")
+        assert cmd[model_idx] == expected
 
     @mock.patch("pi_bot.tts.sd")
     @mock.patch("pi_bot.tts.subprocess.run")

@@ -42,10 +42,12 @@ SYSTEM_PROMPT_DE = (
     "Dein Name ist Pi-Bot. Du bist kein Assistent, du bist ein Freund. "
     "Du antwortest kurz und knapp auf Deutsch. Du hast einen trockenen Humor. "
     "Alles was du sagst wird über Audio ausgegeben, also vermeide z.B. Emojis. "
-    "Wenn du einen Witz erzählen willst, benutze das get_random_joke Tool. "
-    "Wenn du Informationen über das Wetter willst, benutze das get_weather_forecast Tool. "
-    "Wenn du mehr über deinen Zustand wissen willst, benutze das get_system_status Tool. "
-    "Wenn du das Gespräch beenden willst, benutze das end_conversation Tool."
+    "Du hast Tools zur Verfügung. Wenn du ein Tool benutzt, gib das Ergebnis "
+    "in deinen eigenen Worten an den Benutzer weiter. "
+    "Für Witze: benutze get_random_joke und erzähle den zurückgegebenen Witz. "
+    "Für Wetter: benutze get_weather_forecast und fasse die Vorhersage zusammen. "
+    "Für deinen Zustand: benutze get_system_status und berichte die wichtigsten Werte. "
+    "Zum Beenden: benutze end_conversation."
 )
 
 # ---------------------------------------------------------------------------
@@ -56,7 +58,7 @@ TOOLS = [
         "type": "function",
         "function": {
             "name": "get_random_joke",
-            "description": "Returns a random German joke.",
+            "description": "Gibt einen zufälligen deutschen Witz zurück.",
             "parameters": {
                 "type": "object",
                 "properties": {},
@@ -68,7 +70,7 @@ TOOLS = [
         "type": "function",
         "function": {
             "name": "get_weather_forecast",
-            "description": "Returns a weather forecast for the bot's location (Frankfurt am Main). Returns temperature, precipitation, and conditions for the next 3 days.",
+            "description": "Gibt die Wettervorhersage für Frankfurt am Main zurück: Temperatur, Niederschlag und Bedingungen für die nächsten 3 Tage.",
             "parameters": {
                 "type": "object",
                 "properties": {},
@@ -80,7 +82,7 @@ TOOLS = [
         "type": "function",
         "function": {
             "name": "get_system_status",
-            "description": "Returns system status of the Raspberry Pi: CPU temperature, CPU usage, memory usage, disk usage, and uptime.",
+            "description": "Gibt den Systemstatus des Raspberry Pi zurück: CPU-Temperatur, CPU-Auslastung, Speicher, Festplatte und Laufzeit.",
             "parameters": {
                 "type": "object",
                 "properties": {},
@@ -92,7 +94,7 @@ TOOLS = [
         "type": "function",
         "function": {
             "name": "end_conversation",
-            "description": "End the current conversation. Call this when the user indicates they are done or no longer need assistance.",
+            "description": "Beendet das aktuelle Gespräch. Aufrufen wenn der Benutzer sich verabschiedet oder kein weiteres Anliegen hat.",
             "parameters": {
                 "type": "object",
                 "properties": {},

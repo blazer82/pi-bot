@@ -1,0 +1,206 @@
+# Diverse German sentences for Piper voice training
+# ~200 sentences covering various phonemes, intonation, and sentence structures
+
+# Greetings and conversational
+Hallo, ich bin Pi-Bot und freue mich, dich kennenzulernen.
+Guten Morgen, wie hast du geschlafen?
+Guten Abend, schön dass du da bist.
+Na, was gibt es Neues?
+Wie geht es dir heute?
+Lange nicht gesehen, was macht die Arbeit?
+Schönen Feierabend, genieß den Rest vom Tag.
+Bis bald, wir hören uns.
+Tschüss, pass auf dich auf.
+Gute Nacht, schlaf gut.
+
+# Weather and environment
+Die aktuelle Temperatur beträgt zweiundzwanzig Grad Celsius.
+Das Wetter morgen wird leider regnerisch.
+Heute scheint die Sonne den ganzen Tag.
+Am Wochenende werden es bis zu dreißig Grad.
+Zieh dir lieber eine Jacke an, es ist frisch draußen.
+Der Wind kommt aus Nordwest mit fünfzehn Kilometern pro Stunde.
+Es könnte heute Nachmittag Gewitter geben.
+Morgen früh gibt es Nebel, aber danach wird es schön.
+Die Luftfeuchtigkeit liegt bei fünfundsiebzig Prozent.
+Ein perfekter Tag für einen Spaziergang.
+
+# System and technical
+Die CPU-Temperatur liegt bei zweiundfünfzig Grad.
+Der Arbeitsspeicher ist zu siebzig Prozent ausgelastet.
+Die Festplatte hat noch vierunddreißig Gigabyte frei.
+Das System läuft seit drei Tagen ohne Unterbrechung.
+Alle Netzwerkverbindungen sind stabil.
+Ein Update steht zur Verfügung.
+Der Prozessor arbeitet mit voller Auslastung.
+Die Internetverbindung hat eine Latenz von zwölf Millisekunden.
+Ich empfehle einen Neustart, um die Änderungen zu übernehmen.
+Das Backup wurde erfolgreich abgeschlossen.
+
+# Humor and personality
+Kennt ihr den schon? Geht ein Informatiker zum Bäcker.
+Das war jetzt nicht mein bester Witz, gebe ich zu.
+Humor ist, wenn man trotzdem lacht.
+Ich hätte gerne einen trockenen Humor bestellt, keinen nassen.
+Das Beste an Montagmorgen ist, dass sie irgendwann vorbei sind.
+Warum stehen Programmierer so früh auf? Weil es schon halb acht ist.
+Mein Humor ist wie eine Zwiebel, er hat viele Schichten.
+Ich bin ein Roboter, ich darf schlechte Witze machen.
+Das war ein klassischer Schenkelklopfer, oder?
+Lachen ist die beste Medizin, sagt man jedenfalls.
+
+# Questions
+Möchtest du einen Witz hören?
+Soll ich das Wetter für morgen nachschauen?
+Wie kann ich dir heute helfen?
+Hast du noch andere Fragen?
+Was hältst du davon?
+Willst du mehr darüber erfahren?
+Brauchst du eine Zusammenfassung?
+Soll ich die Informationen wiederholen?
+Interessiert dich das Thema?
+Kann ich sonst noch etwas für dich tun?
+
+# Exclamations
+Das ist ja fantastisch!
+Unglaublich, das hätte ich nicht erwartet!
+Na sowas, das ist wirklich überraschend.
+Ach du meine Güte!
+Wahnsinn, das klingt beeindruckend.
+Super, das hat geklappt!
+Toll, freut mich zu hören.
+Mensch, das ist ja ein Ding!
+Genau, so sehe ich das auch.
+Richtig, gut erkannt.
+
+# Numbers and quantities
+Es ist jetzt vierzehn Uhr dreiunddreißig.
+Die Strecke beträgt ungefähr siebenhundert Kilometer.
+Das Rezept braucht zweihundertfünfzig Gramm Mehl.
+Frankfurt hat etwa siebenhundertvierundfünfzigtausend Einwohner.
+Der Mount Everest ist achttausendachthundertachtundvierzig Meter hoch.
+Heute ist der siebzehnte April zweitausendsechsundzwanzig.
+Die Lichtgeschwindigkeit beträgt fast dreihunderttausend Kilometer pro Sekunde.
+Ein Marathon hat zweiundvierzig Komma eins neun fünf Kilometer.
+Wasser kocht bei hundert Grad Celsius.
+Das Paket wiegt drei Komma fünf Kilogramm.
+
+# Long compound words (German speciality)
+Die Straßenbahnhaltestelle ist gleich um die Ecke.
+Der Geschwindigkeitsbegrenzungsschild zeigt dreißig an.
+Die Krankenversicherungsbeiträge steigen mal wieder.
+Ein Donaudampfschifffahrtsgesellschaftskapitän hat es nicht leicht.
+Der Rindfleischetikettierungsüberwachungsaufgabenübertragungsgesetzgeber tagt morgen.
+Die Grundstücksverkehrsgenehmigungszuständigkeitsübertragungsverordnung ist kompliziert.
+Der Handschuhschneeballwerfer wurde auf frischer Tat ertappt.
+Ein Streichholzschächtelchen ist kleiner als eine Streichholzschachtel.
+Die Arbeitsunfähigkeitsbescheinigung liegt auf dem Tisch.
+Die Bundesausbildungsförderungsgesetzregelung wird überarbeitet.
+
+# Everyday activities
+Ich habe heute einen langen Spaziergang gemacht.
+Das Abendessen steht gleich auf dem Tisch.
+Vergiss nicht, den Müll rauszubringen.
+Hast du schon die Nachrichten gehört?
+Der Kaffee ist fertig, bedien dich.
+Das Buch, das du empfohlen hast, war wirklich gut.
+Morgen habe ich einen Termin beim Zahnarzt.
+Die Kinder spielen draußen im Garten.
+Ich muss noch schnell einkaufen gehen.
+Der Film gestern Abend war ziemlich spannend.
+
+# Instructions and directions
+Geh geradeaus und dann die zweite Straße links.
+Drück den roten Knopf, um das Gerät einzuschalten.
+Rühr die Soße langsam um, damit sie nicht anbrennt.
+Warte einen Moment, ich bin gleich soweit.
+Leg das Buch bitte auf den Schreibtisch.
+Schließ die Tür hinter dir ab.
+Fahr vorsichtig, die Straßen sind glatt.
+Misch alle Zutaten in einer großen Schüssel zusammen.
+Lade die App herunter und erstelle ein Konto.
+Stell den Wecker auf sechs Uhr dreißig.
+
+# Opinions and descriptions
+Meiner Meinung nach ist das eine gute Entscheidung.
+Das klingt nach einem vernünftigen Plan.
+Ich bin mir da nicht ganz sicher, ehrlich gesagt.
+Einerseits verstehe ich deinen Standpunkt, andererseits gibt es Bedenken.
+Das ist ein kompliziertes Thema mit vielen Facetten.
+Im Großen und Ganzen läuft alles nach Plan.
+Ich würde vorschlagen, noch einen Tag zu warten.
+Das Ergebnis hat meine Erwartungen übertroffen.
+So wie ich das sehe, gibt es drei Möglichkeiten.
+Lass uns das Schritt für Schritt durchgehen.
+
+# Science and knowledge
+Die Erde dreht sich einmal in vierundzwanzig Stunden um ihre Achse.
+Wasser besteht aus zwei Wasserstoff- und einem Sauerstoffatom.
+Der menschliche Körper besteht zu sechzig Prozent aus Wasser.
+Die Schwerkraft auf dem Mond beträgt nur ein Sechstel der Erdanziehung.
+Albert Einstein veröffentlichte die Relativitätstheorie im Jahr neunzehnhundertfünfzehn.
+Ein Lichtjahr ist die Strecke, die Licht in einem Jahr zurücklegt.
+Das Periodensystem enthält hundertachtzehn chemische Elemente.
+Dinosaurier lebten vor etwa sechsundsechzig Millionen Jahren.
+Die DNA enthält den genetischen Bauplan jedes Lebewesens.
+Der nächste Stern nach der Sonne ist Proxima Centauri.
+
+# Food and cooking
+Heute Abend mache ich Spaghetti Bolognese.
+Die Breze schmeckt am besten frisch aus dem Ofen.
+Für den Kuchen brauchen wir drei Eier und zweihundert Gramm Zucker.
+Der Sauerbraten muss mindestens drei Tage marinieren.
+Kartoffelsalat gibt es in Deutschland in vielen verschiedenen Varianten.
+Schnitzel mit Pommes ist ein echter Klassiker.
+Das Brot hier wird noch richtig handwerklich gebacken.
+Möchtest du lieber Tee oder Kaffee?
+Die Suppe muss noch eine halbe Stunde köcheln.
+Zum Nachtisch gibt es Apfelstrudel mit Vanillesoße.
+
+# Culture and geography
+Frankfurt liegt am Main im Herzen von Deutschland.
+Der Rhein ist der längste Fluss, der durch Deutschland fließt.
+Die Berliner Mauer fiel am neunten November neunzehnhundertneunundachtzig.
+Deutschland hat sechzehn Bundesländer.
+Das Oktoberfest in München ist das größte Volksfest der Welt.
+Der Schwarzwald ist bekannt für seine Kuckucksuhren.
+Beethoven wurde in Bonn geboren und lebte später in Wien.
+Die Deutsche Bahn verbindet alle größeren Städte.
+Der Kölner Dom ist eine der meistbesuchten Sehenswürdigkeiten.
+Heidelberg hat eine der ältesten Universitäten Europas.
+
+# Emotions and feelings
+Das freut mich wirklich sehr für dich.
+Tut mir leid, das ist wirklich ärgerlich.
+Ich kann verstehen, dass dich das frustriert.
+Das macht mich neugierig, erzähl mir mehr.
+Keine Sorge, das kriegen wir schon hin.
+Ich bin gespannt, wie das weitergeht.
+Das klingt aufregend und ein bisschen beängstigend zugleich.
+Manchmal braucht man einfach eine Pause.
+Ich bin stolz auf das, was wir geschafft haben.
+Kopf hoch, morgen sieht die Welt schon anders aus.
+
+# Technology
+Künstliche Intelligenz verändert unseren Alltag grundlegend.
+Der Raspberry Pi ist ein erstaunlich vielseitiger Minicomputer.
+Spracherkennung hat sich in den letzten Jahren enorm verbessert.
+Maschinelles Lernen braucht große Datenmengen zum Trainieren.
+Die Cloud ermöglicht den Zugriff auf Daten von überall.
+Verschlüsselung schützt unsere persönlichen Informationen.
+Quantencomputer könnten die Rechenleistung revolutionieren.
+Autonomes Fahren wird die Mobilität verändern.
+Dreidimensionaler Druck ermöglicht die Herstellung komplexer Bauteile.
+Das Internet der Dinge vernetzt immer mehr Geräte miteinander.
+
+# Mixed phoneme coverage
+Die Psychologie erforscht das menschliche Verhalten und Erleben.
+Philosophen stellen seit Jahrtausenden die großen Fragen des Lebens.
+Der Chrysanthemengarten blüht besonders schön im Herbst.
+Ein Xylophon erzeugt helle, klare Töne.
+Der Rhythmus der Musik bewegt Menschen auf der ganzen Welt.
+Schmetterlinge durchlaufen eine vollständige Metamorphose.
+Die Bibliothek hat über zehntausend Bücher im Bestand.
+Zwetschgenkuchen ist eine süddeutsche Spezialität.
+Die Qualle treibt lautlos durch das Meer.
+Pfifferlinge schmecken am besten frisch aus dem Wald.

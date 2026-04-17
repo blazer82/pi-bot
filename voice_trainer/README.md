@@ -1,0 +1,124 @@
+# Voice Trainer
+
+Train a custom Piper TTS voice for Pi-Bot. The pipeline uses Coqui XTTS to generate a large synthetic corpus, applies audio effects to shape the voice character, and trains a Piper model that drops into Pi-Bot as an ONNX file.
+
+**Run this on a desktop/GPU machine, not the Pi.** Requires **Python 3.10 or 3.11** (Coqui TTS needs >=3.9 but <3.12).
+
+## Setup
+
+Create a separate venv with Python 3.11:
+
+```bash
+python3.11 -m venv venv-voice-trainer
+source venv-voice-trainer/bin/activate
+pip install -r requirements-voice-trainer.txt
+```
+
+For training (Step 4), you also need the Piper training environment:
+
+```bash
+git clone https://github.com/rhasspy/piper
+cd piper/src/python
+pip install -e ".[train]"
+```
+
+And `espeak-ng` for phonemization:
+
+```bash
+# macOS
+brew install espeak-ng
+
+# Ubuntu/Debian
+sudo apt install espeak-ng
+```
+
+## Pipeline
+
+### Step 1: Set up XTTS
+
+Test that XTTS loads and synthesizes correctly. First run downloads the model (~2GB).
+
+```bash
+# Test with default text
+python -m voice_trainer xtts-setup
+
+# Clone a voice from a reference recording
+python -m voice_trainer xtts-setup --speaker-wav my_voice.wav
+
+# List available built-in speakers
+python -m voice_trainer xtts-setup --list-speakers
+```
+
+### Step 2: Generate corpus
+
+Batch-render sentences to WAV in LJSpeech format. A starter corpus of 170 German sentences is included — enough for a ~15-minute test run. For a full voice, use 1000+ sentences (~1-2 hours of audio).
+
+```bash
+# Quick test with 10 sentences
+python -m voice_trainer generate --max-sentences 10
+
+# Full generation with voice cloning
+python -m voice_trainer generate --speaker-wav my_voice.wav
+
+# Use a custom sentence file
+python -m voice_trainer generate --sentences my_sentences.txt
+```
+
+The output lands in `voice_trainer_output/` with `wavs/` and `metadata.csv`.
+
+Generation supports **resuming** — if interrupted, rerun the same command and it skips existing files.
+
+Larger sentence sources:
+
+- [CSS10 German dataset](https://github.com/Kyubyong/css10) — thousands of read sentences
+- Generate domain-specific sentences with Claude (conversational, weather reports, jokes, etc.)
+
+### Step 3: Post-process
+
+Apply audio effects to shape the voice character. This is the creative step — tweak the parameters until it sounds right.
+
+```bash
+# Default effects: pitch -2st, bitcrush 14bit, lowpass 7kHz
+python -m voice_trainer postprocess
+
+# Custom effects
+python -m voice_trainer postprocess --pitch -3 --bitcrush 12 --lowpass 6000
+```
+
+Processed files go to `voice_trainer_output/wavs_processed/`.
+
+Listen to a few samples after processing. If the voice doesn't sound right, adjust and rerun — this step is fast.
+
+### Step 4: Train Piper model
+
+Needs a GPU. Use a cloud instance (RunPod, Vast.ai, ~$2-5 for a full run) if you don't have one locally.
+
+```bash
+# Start training
+python -m voice_trainer train
+
+# Resume from checkpoint
+python -m voice_trainer train --resume-from lightning_logs/version_0/checkpoints/last.ckpt
+
+# Custom hyperparameters
+python -m voice_trainer train --batch-size 16 --max-epochs 5000
+```
+
+When you're happy with a checkpoint, export and install:
+
+```bash
+# Export to ONNX
+python -m voice_trainer train --export path/to/last.ckpt
+
+# Export and install directly into Pi-Bot's models/piper/
+python -m voice_trainer train --export path/to/last.ckpt --install
+```
+
+After installing, update `CONFIG["piper_model"]` in `pi_bot/config.py` to the new model name.
+
+## Tips
+
+- **Start small.** Generate 15 minutes first, train a quick model, listen. Scale to 2 hours once the voice direction is right.
+- **Sample rate.** Everything stays at 22050Hz throughout — that's what Piper expects.
+- **XTTS is slow.** Expect ~2-5x realtime on GPU. A 2-hour corpus can take 4-10 hours to generate.
+- **Post-processing is iterative.** Try different effect combinations. Subtle changes make a big difference.

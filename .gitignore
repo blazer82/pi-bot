@@ -3,4 +3,7 @@ __pycache__/
 *.pyc
 .DS_Store
 models/piper/
+voice_trainer_output/
+venv-voice-trainer/
+piper/
 .claude/

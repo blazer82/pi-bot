@@ -1,4 +1,2 @@
-FROM gemma4:e4b
+FROM gemma4:e4b-it-q4_K_M
 PARAMETER num_ctx 2048
-PARAMETER num_thread 4
-PARAMETER num_gpu 0

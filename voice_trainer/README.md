@@ -51,7 +51,7 @@ python -m voice_trainer xtts-setup --list-speakers
 
 ### Step 2: Generate corpus
 
-Batch-render sentences to WAV in LJSpeech format. A starter corpus of 170 German sentences is included — enough for a ~15-minute test run. For a full voice, use 1000+ sentences (~1-2 hours of audio).
+Batch-render sentences to WAV in LJSpeech format. A starter corpus of ~200 German sentences is included — enough for a ~15-minute test run. For a full voice, use 1000+ sentences (~1-2 hours of audio).
 
 ```bash
 # Quick test with 10 sentences
@@ -64,9 +64,16 @@ python -m voice_trainer generate --speaker-wav my_voice.wav
 python -m voice_trainer generate --sentences my_sentences.txt
 ```
 
-The output lands in `voice_trainer_output/` with `wavs/` and `metadata.csv`.
+The output lands in `voice_trainer_output/` with:
+
+- `wavs/` — individual WAV files per sentence
+- `metadata.csv` — LJSpeech-format mapping (`file_id|sentence`)
+- `concat_full.wav` — all clips concatenated with 1.5s silence gaps (for DAW processing)
+- `concat_markers.json` — timestamps and sentence text for each clip in the concatenated WAV
 
 Generation supports **resuming** — if interrupted, rerun the same command and it skips existing files.
+
+**Trailing artifact trimming** is enabled by default. XTTS sometimes appends garbled/reversed audio at the end of clips — the generator uses spectral flatness analysis and text-length-based duration capping to detect and trim these artifacts before writing.
 
 Larger sentence sources:
 
@@ -75,7 +82,24 @@ Larger sentence sources:
 
 ### Step 3: Post-process
 
-Apply audio effects to shape the voice character. This is the creative step — tweak the parameters until it sounds right.
+Two options for shaping the voice character:
+
+**Option A: Manual DAW processing (recommended)**
+
+Open `concat_full.wav` in your DAW (Logic, Audacity, etc.), apply effects, EQ, and cleanup across the entire corpus at once. Export as a single WAV, then split back into individual training clips:
+
+```bash
+python -m voice_trainer split processed_from_daw.wav
+
+# Custom markers file or output directory
+python -m voice_trainer split processed.wav --markers path/to/concat_markers.json --output-dir my_output/
+```
+
+The split command detects silence gaps to find sentence boundaries, and validates against the original markers. If silence detection fails (e.g. effects filled the gaps), it falls back to marker-based timestamp splitting. Output goes to `voice_trainer_output/wavs_processed/`.
+
+**Option B: Automated effects**
+
+Apply a preset effects chain (pitch shift, bitcrush, lowpass filter):
 
 ```bash
 # Default effects: pitch -2st, bitcrush 14bit, lowpass 7kHz

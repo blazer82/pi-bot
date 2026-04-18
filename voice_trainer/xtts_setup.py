@@ -74,6 +74,11 @@ def test_synthesis(
             print("Error: no --speaker-wav provided and no built-in speakers found.", file=sys.stderr)
             sys.exit(1)
 
+    if config.get("xtts_temperature") is not None:
+        kwargs["temperature"] = config["xtts_temperature"]
+    if config.get("xtts_gpt_cond_len") is not None:
+        kwargs["gpt_cond_len"] = config["xtts_gpt_cond_len"]
+
     print(f"Synthesizing: \"{text}\"")
     tts.tts_to_file(**kwargs)
 

@@ -11,6 +11,8 @@ TRAINER_CONFIG = {
     "language": "de",
     "speaker_wav": None,
     "xtts_speaker": None,
+    "xtts_temperature": 0.3,
+    "xtts_gpt_cond_len": 12,
 
     # Corpus
     "sentences_file": os.path.join(_PACKAGE_DIR, "data", "sentences_de.txt"),
@@ -21,6 +23,22 @@ TRAINER_CONFIG = {
     "wavs_subdir": "wavs",
     "processed_subdir": "wavs_processed",
     "metadata_file": "metadata.csv",
+
+    # Trim (energy-based endpoint detection)
+    "trim_trailing": True,
+    "trim_energy_threshold_db": -35.0,
+    "trim_frame_length_ms": 20,
+    "trim_min_trailing_silence_ms": 150,
+
+    # Concatenation
+    "concat_output": True,
+    "concat_gap_seconds": 1.5,
+    "concat_filename": "concat_full.wav",
+    "concat_markers_filename": "concat_markers.json",
+
+    # Split
+    "split_min_silence_ms": 500,
+    "split_silence_threshold_db": -35.0,
 
     # Post-processing (pedalboard)
     "effects": {

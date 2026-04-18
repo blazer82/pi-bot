@@ -39,6 +39,12 @@ def build_parser() -> argparse.ArgumentParser:
     p3.add_argument("--bitcrush", type=int, help="Bitcrush bit depth")
     p3.add_argument("--lowpass", type=float, help="Lowpass cutoff frequency in Hz")
 
+    # split
+    p_split = sub.add_parser("split", help="Split DAW-processed WAV back into individual clips")
+    p_split.add_argument("input_wav", help="Path to the processed concatenated WAV file")
+    p_split.add_argument("--markers", help="Path to markers JSON (default: from output dir)")
+    p_split.add_argument("--output-dir", help="Output base directory")
+
     # train
     p4 = sub.add_parser("train", help="Train Piper model from processed dataset")
     p4.add_argument("--dataset-dir", help="LJSpeech-format dataset directory")
@@ -68,6 +74,11 @@ def dispatch(args: argparse.Namespace) -> None:
 
     elif args.command == "postprocess":
         from voice_trainer.postprocess import run
+
+        run(args, TRAINER_CONFIG)
+
+    elif args.command == "split":
+        from voice_trainer.split import run
 
         run(args, TRAINER_CONFIG)
 

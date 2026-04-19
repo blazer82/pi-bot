@@ -52,6 +52,26 @@ def prepare_dataset(dataset_dir: str) -> str:
     return audio_dir
 
 
+def preprocess_dataset(dataset_dir: str) -> None:
+    config_path = os.path.join(dataset_dir, "config.json")
+    if os.path.isfile(config_path):
+        print("Preprocessing already done (config.json exists), skipping.")
+        return
+
+    print("Running piper_train preprocessing...")
+    cmd = [
+        sys.executable, "-m", "piper_train.preprocess",
+        "--language", "de",
+        "--input-dir", dataset_dir,
+        "--output-dir", dataset_dir,
+        "--sample-rate", "22050",
+        "--dataset-format", "ljspeech",
+        "--single-speaker",
+    ]
+    subprocess.run(cmd, check=True)
+    print("Preprocessing complete.\n")
+
+
 def run_training(dataset_dir: str, config: dict, resume_from: str | None = None) -> None:
     cmd = [
         sys.executable, "-m", "piper_train",
@@ -128,6 +148,7 @@ def run(args, config: dict) -> None:
 
     dataset_dir = args.dataset_dir or config["output_dir"]
     prepare_dataset(dataset_dir)
+    preprocess_dataset(dataset_dir)
 
     print()
     run_training(dataset_dir, config, resume_from=args.resume_from)

@@ -152,14 +152,30 @@ docker buildx build --platform linux/amd64 -t <dockerhub-user>/pi-bot-trainer --
 
 On RunPod, create a pod with **Custom Container** (not a template) and paste the Docker Hub image name. Pick a 30xx/40xx series or A4000/A5000 GPU — a 4090 is usually cheapest and takes ~30–60 min for a 15-minute corpus. Avoid K80/P100/V100 (old CUDA).
 
-Once the pod is running, open a shell into it, upload your post-processed corpus to `/workspace/pi-bot/voice_trainer_output/` (via `runpodctl send`, `scp`, or a mounted volume), then:
+RunPod mounts a persistent volume at `/workspace/`, so clone the repo there and upload your corpus:
+
+```bash
+cd /workspace
+git clone <your-repo-url> pi-bot
+cd pi-bot
+# upload voice_trainer_output/metadata.csv and voice_trainer_output/wavs_processed/ (or wavs/)
+```
+
+**Important:** Piper's preprocessor expects audio in a `wavs/` directory. If you only have `wavs_processed/`, symlink it:
+
+```bash
+cd voice_trainer_output
+ln -s wavs_processed wavs
+```
+
+Then run training:
 
 ```bash
 ./train.sh                                  # defaults
 ./train.sh --batch-size 16 --max-epochs 5000  # extra flags forwarded to voice_trainer
 ```
 
-`train.sh` checks that a GPU is visible and that the corpus is present before kicking off training.
+`train.sh` checks that a GPU is visible and that the corpus is present. The training pipeline automatically runs Piper's preprocessing (phonemization, `config.json` generation) if it hasn't been done yet.
 
 Download `lightning_logs/version_<n>/checkpoints/last.ckpt` off the pod when you're happy with it, then run the export/install locally:
 
@@ -173,3 +189,9 @@ python -m voice_trainer train --export last.ckpt --install
 - **Sample rate.** Everything stays at 22050Hz throughout — that's what Piper expects.
 - **XTTS is slow.** Expect ~2-5x realtime on GPU. A 2-hour corpus can take 4-10 hours to generate.
 - **Post-processing is iterative.** Try different effect combinations. Subtle changes make a big difference.
+
+## Note on piper_train
+
+The original [rhasspy/piper](https://github.com/rhasspy/piper) repo has been archived and moved to [OHF-Voice/piper1-gpl](https://github.com/OHF-Voice/piper1-gpl). `piper_train` pins PyTorch <2 and `pytorch-lightning~=1.7`, which is why this pipeline needs a custom Docker image rather than a standard RunPod template. The Dockerfile handles all necessary workarounds (dependency conflicts, cuFFT patch for RTX 40xx GPUs).
+
+If training becomes unmaintainable, alternatives to consider: [veralvx/piper-train](https://github.com/veralvx/piper-train) (fork with PyTorch 2.5 support, same ONNX output), or [Kokoro-82M](https://github.com/hexgrad/kokoro) (lightweight, high-quality TTS — would need ONNX export testing for Pi 5).

@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /workspace
 
-RUN git clone https://github.com/rhasspy/piper && \
+RUN git clone --depth 1 https://github.com/rhasspy/piper && \
     cd piper/src/python && \
     pip install -e ".[train]"
 

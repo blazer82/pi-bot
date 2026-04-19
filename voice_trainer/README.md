@@ -140,6 +140,34 @@ python -m voice_trainer train --export path/to/last.ckpt --install
 
 After installing, update `CONFIG["piper_model"]` in `pi_bot/config.py` to the new model name.
 
+#### Docker / RunPod
+
+The repo ships a `Dockerfile` and `train.sh` at the root so you can run Step 4 on a rented GPU (e.g. RunPod) without hand-installing CUDA, piper_train, and espeak-ng.
+
+Build and push the image from your machine:
+
+```bash
+docker build -t <dockerhub-user>/pi-bot-trainer .
+docker push <dockerhub-user>/pi-bot-trainer
+```
+
+On RunPod, create a pod with **Custom Container** (not a template) and paste the Docker Hub image name. Pick a 30xx/40xx series or A4000/A5000 GPU — a 4090 is usually cheapest and takes ~30–60 min for a 15-minute corpus. Avoid K80/P100/V100 (old CUDA).
+
+Once the pod is running, open a shell into it, upload your post-processed corpus to `/workspace/pi-bot/voice_trainer_output/` (via `runpodctl send`, `scp`, or a mounted volume), then:
+
+```bash
+./train.sh                                  # defaults
+./train.sh --batch-size 16 --max-epochs 5000  # extra flags forwarded to voice_trainer
+```
+
+`train.sh` checks that a GPU is visible and that the corpus is present before kicking off training.
+
+Download `lightning_logs/version_<n>/checkpoints/last.ckpt` off the pod when you're happy with it, then run the export/install locally:
+
+```bash
+python -m voice_trainer train --export last.ckpt --install
+```
+
 ## Tips
 
 - **Start small.** Generate 15 minutes first, train a quick model, listen. Scale to 2 hours once the voice direction is right.

@@ -11,11 +11,10 @@ RUN git clone --depth 1 https://github.com/rhasspy/piper && \
     cd piper/src/python && \
     pip install -e ".[train]"
 
-COPY voice_trainer/requirements-voice-trainer.txt .
-RUN pip install -r requirements-voice-trainer.txt
-
 COPY . /workspace/pi-bot
 
 WORKDIR /workspace/pi-bot
 
 ENV NUMBA_CACHE_DIR=/tmp/.numba_cache
+
+CMD ["sleep", "infinity"]

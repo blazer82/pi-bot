@@ -147,8 +147,7 @@ The repo ships a `Dockerfile` and `train.sh` at the root so you can run Step 4 o
 Build and push the image from your machine:
 
 ```bash
-docker build -t <dockerhub-user>/pi-bot-trainer .
-docker push <dockerhub-user>/pi-bot-trainer
+docker buildx build --platform linux/amd64 -t <dockerhub-user>/pi-bot-trainer --push .
 ```
 
 On RunPod, create a pod with **Custom Container** (not a template) and paste the Docker Hub image name. Pick a 30xx/40xx series or A4000/A5000 GPU — a 4090 is usually cheapest and takes ~30–60 min for a 15-minute corpus. Avoid K80/P100/V100 (old CUDA).

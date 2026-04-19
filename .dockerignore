@@ -1,0 +1,13 @@
+venv/
+venv-voice-trainer/
+__pycache__/
+*.pyc
+.DS_Store
+models/piper/
+voice_trainer_output/
+piper/
+.claude/
+.git/
+.gitignore
+Dockerfile
+.dockerignore

@@ -142,26 +142,39 @@ Then download the `.onnx` file and the checkpoint's `config.json` (rename to `<m
 
 On RunPod, create a pod with a **PyTorch** template. Pick a 30xx/40xx series or A4000/A5000 GPU — a 4090 is usually cheapest. Fine-tuning ~1000 epochs should take well under an hour for a 15-minute corpus.
 
-RunPod mounts a persistent volume at `/workspace/`. Clone the repo, run the setup script (once per pod), and upload your corpus:
+RunPod mounts a persistent volume at `/workspace/`. Clone the repo and run the setup script (once per pod):
 
 ```bash
 cd /workspace
 git clone <your-repo-url> pi-bot
 cd pi-bot
 
-# One-time setup — installs piper1-gpl, downloads pretrained checkpoint
+# One-time setup — creates two venvs, downloads pretrained checkpoint
 bash setup_runpod.sh
-
-# Upload voice_trainer_output/metadata.csv and voice_trainer_output/wavs_processed/ (or wavs/)
 ```
 
-The setup script is idempotent — if a pod restarts, rerunning it skips already-completed steps. On persistent volumes, piper1-gpl and the checkpoint survive restarts.
+The setup script creates two isolated venvs (Coqui XTTS and piper1-gpl can't coexist):
 
-Then run training:
+| Venv | Path | Used by |
+|------|------|---------|
+| Generation | `/workspace/venv-generate` | `xtts-setup`, `generate`, `postprocess`, `split` |
+| Training | `/workspace/venv-train` | `train` |
+
+`python3 -m voice_trainer` automatically activates the correct venv for each command — no manual `source activate` needed.
+
+The setup script is idempotent — if a pod restarts, rerunning it skips already-completed steps. On persistent volumes, both venvs and the checkpoint survive restarts.
+
+Run the full pipeline on RunPod:
 
 ```bash
-./train.sh                                    # defaults
-./train.sh --batch-size 16 --max-epochs 2000  # extra flags forwarded to voice_trainer
+# Download sentences + generate corpus
+python3 -m voice_trainer download-sentences
+python3 -m voice_trainer generate --speaker-wav your_voice.wav
+
+# Post-process and train
+python3 -m voice_trainer postprocess
+./train.sh
+./train.sh --batch-size 16 --max-epochs 2000  # custom hyperparameters
 ```
 
 `train.sh` checks that a GPU is visible, piper.train is installed, the corpus is present, and the pretrained checkpoint exists.

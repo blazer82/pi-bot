@@ -29,6 +29,7 @@ TRAINER_CONFIG = {
     "trim_energy_threshold_db": -35.0,
     "trim_frame_length_ms": 20,
     "trim_min_trailing_silence_ms": 150,
+    "trim_silence_gap_ms": 650,
 
     # Concatenation
     "concat_output": True,

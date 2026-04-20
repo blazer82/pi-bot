@@ -43,7 +43,7 @@ def _trim_trailing_artifact(
     threshold_db: float = -35.0,
     frame_length_ms: float = 20.0,
     min_trailing_ms: float = 150.0,
-    flatness_threshold: float = 0.4,
+    silence_gap_ms: float = 300.0,
     chars_per_second: float = 12.0,
 ) -> np.ndarray:
     frame_len = int(sr * frame_length_ms / 1000)
@@ -57,19 +57,29 @@ def _trim_trailing_artifact(
             audio = audio[:max_samples]
 
     num_frames = len(audio) // frame_len
-    last_speech_frame = 0
+    silence_gap_frames = int(silence_gap_ms / frame_length_ms)
 
-    for i in range(num_frames - 1, -1, -1):
+    is_silent = np.zeros(num_frames, dtype=bool)
+    for i in range(num_frames):
         start = i * frame_len
         frame = audio[start : start + frame_len]
         rms = np.sqrt(np.mean(frame ** 2))
         energy_db = 20 * np.log10(rms + 1e-10)
-        if energy_db <= threshold_db:
-            continue
-        flatness = _spectral_flatness(frame)
-        if flatness < flatness_threshold:
+        is_silent[i] = energy_db <= threshold_db
+
+    speech_started = False
+    consecutive_silent = 0
+    last_speech_frame = 0
+
+    for i in range(num_frames):
+        if not is_silent[i]:
+            speech_started = True
+            consecutive_silent = 0
             last_speech_frame = i
-            break
+        elif speech_started:
+            consecutive_silent += 1
+            if consecutive_silent >= silence_gap_frames:
+                break
 
     cut_sample = (last_speech_frame + 1) * frame_len
     if cut_sample < int(sr * 0.1):
@@ -237,6 +247,7 @@ def generate_corpus(tts, sentences: list[str], config: dict) -> None:
                         threshold_db=config.get("trim_energy_threshold_db", -35.0),
                         frame_length_ms=config.get("trim_frame_length_ms", 20),
                         min_trailing_ms=config.get("trim_min_trailing_silence_ms", 150),
+                        silence_gap_ms=config.get("trim_silence_gap_ms", 300),
                     )
 
                 sf.write(wav_path, audio, target_sr)

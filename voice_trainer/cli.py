@@ -45,12 +45,25 @@ def build_parser() -> argparse.ArgumentParser:
     p_split.add_argument("--markers", help="Path to markers JSON (default: from output dir)")
     p_split.add_argument("--output-dir", help="Output base directory")
 
+    # download-sentences
+    p_dl = sub.add_parser(
+        "download-sentences", help="Download German sentences from Tatoeba (CC0)"
+    )
+    p_dl.add_argument(
+        "--count", type=int, default=1000, help="Number of sentences to select"
+    )
+    p_dl.add_argument("--output", help="Output file path")
+    p_dl.add_argument(
+        "--seed", type=int, default=42, help="Random seed for reproducible selection"
+    )
+
     # train
     p4 = sub.add_parser("train", help="Train Piper model from processed dataset")
     p4.add_argument("--dataset-dir", help="LJSpeech-format dataset directory")
     p4.add_argument("--batch-size", type=int, help="Training batch size")
     p4.add_argument("--max-epochs", type=int, help="Maximum training epochs")
-    p4.add_argument("--resume-from", help="Checkpoint path to resume from")
+    p4.add_argument("--pretrained-checkpoint", help="Pretrained .ckpt for fine-tuning")
+    p4.add_argument("--resume-from", help="Resume interrupted training from checkpoint")
     p4.add_argument("--export", help="Export checkpoint to ONNX (pass checkpoint path)")
     p4.add_argument(
         "--install",
@@ -79,6 +92,11 @@ def dispatch(args: argparse.Namespace) -> None:
 
     elif args.command == "split":
         from voice_trainer.split import run
+
+        run(args, TRAINER_CONFIG)
+
+    elif args.command == "download-sentences":
+        from voice_trainer.download import run
 
         run(args, TRAINER_CONFIG)
 

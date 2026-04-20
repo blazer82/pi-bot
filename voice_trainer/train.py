@@ -1,4 +1,4 @@
-"""Step 4: Piper model training, export, and installation."""
+"""Step 4: Piper model fine-tuning, export, and installation."""
 
 import os
 import shutil
@@ -9,7 +9,7 @@ import sys
 def check_piper_install() -> bool:
     try:
         result = subprocess.run(
-            [sys.executable, "-m", "piper_train", "--help"],
+            [sys.executable, "-m", "piper.train", "--help"],
             capture_output=True,
             text=True,
         )
@@ -19,10 +19,11 @@ def check_piper_install() -> bool:
 
 
 def _print_setup_instructions() -> None:
-    print("piper_train is not installed. To set it up:\n")
-    print("  git clone https://github.com/rhasspy/piper")
-    print("  cd piper/src/python")
+    print("piper.train is not installed. To set it up:\n")
+    print("  git clone --branch v1.3.0 https://github.com/OHF-voice/piper1-gpl")
+    print("  cd piper1-gpl")
     print('  pip install -e ".[train]"')
+    print("  bash build_monotonic_align.sh")
     print("\nYou also need espeak-ng for phonemization:")
     print("  # macOS:  brew install espeak-ng")
     print("  # Ubuntu: sudo apt install espeak-ng")
@@ -52,40 +53,31 @@ def prepare_dataset(dataset_dir: str) -> str:
     return audio_dir
 
 
-def preprocess_dataset(dataset_dir: str) -> None:
-    config_path = os.path.join(dataset_dir, "config.json")
-    if os.path.isfile(config_path):
-        print("Preprocessing already done (config.json exists), skipping.")
-        return
+def run_training(dataset_dir: str, config: dict,
+                 pretrained_ckpt: str | None = None,
+                 resume_from: str | None = None) -> None:
+    metadata_path = os.path.join(dataset_dir, "metadata.csv")
 
-    print("Running piper_train preprocessing...")
+    processed_dir = os.path.join(dataset_dir, "wavs_processed")
+    wavs_dir = os.path.join(dataset_dir, "wavs")
+    audio_dir = processed_dir if os.path.isdir(processed_dir) else wavs_dir
+
     cmd = [
-        sys.executable, "-m", "piper_train.preprocess",
-        "--language", "de",
-        "--input-dir", dataset_dir,
-        "--output-dir", dataset_dir,
-        "--sample-rate", "22050",
-        "--dataset-format", "ljspeech",
-        "--single-speaker",
-    ]
-    subprocess.run(cmd, check=True)
-    print("Preprocessing complete.\n")
-
-
-def run_training(dataset_dir: str, config: dict, resume_from: str | None = None) -> None:
-    cmd = [
-        sys.executable, "-m", "piper_train",
-        "--dataset-dir", dataset_dir,
-        "--accelerator", "gpu",
-        "--devices", "1",
-        "--batch-size", str(config["piper_batch_size"]),
-        "--validation-split", str(config["piper_validation_split"]),
-        "--num-test-examples", str(config["piper_num_test_examples"]),
-        "--max_epochs", str(config["piper_max_epochs"]),
+        sys.executable, "-m", "piper.train", "fit",
+        "--data.voice_name", config["piper_voice_name"],
+        "--data.csv_path", metadata_path,
+        "--data.audio_dir", audio_dir,
+        "--data.espeak_voice", config["piper_espeak_voice"],
+        "--model.sample_rate", str(config["sample_rate"]),
+        "--data.cache_dir", config["piper_cache_dir"],
+        "--data.config_path", config["piper_config_path"],
+        "--data.batch_size", str(config["piper_batch_size"]),
+        "--trainer.max_epochs", str(config["piper_max_epochs"]),
     ]
 
-    if resume_from:
-        cmd.extend(["--resume_from_checkpoint", resume_from])
+    ckpt = resume_from or pretrained_ckpt or config.get("piper_pretrained_checkpoint")
+    if ckpt:
+        cmd.extend(["--ckpt_path", ckpt])
 
     print(f"Running: {' '.join(cmd)}\n")
     subprocess.run(cmd, check=True)
@@ -97,9 +89,9 @@ def export_onnx(checkpoint_path: str, output_path: str) -> None:
         sys.exit(1)
 
     cmd = [
-        sys.executable, "-m", "piper_train",
-        "--onnx-output", output_path,
+        sys.executable, "-m", "piper.train.export_onnx",
         "--checkpoint", checkpoint_path,
+        "--output-file", output_path,
     ]
 
     print(f"Exporting: {checkpoint_path} -> {output_path}")
@@ -148,7 +140,10 @@ def run(args, config: dict) -> None:
 
     dataset_dir = args.dataset_dir or config["output_dir"]
     prepare_dataset(dataset_dir)
-    preprocess_dataset(dataset_dir)
 
     print()
-    run_training(dataset_dir, config, resume_from=args.resume_from)
+    run_training(
+        dataset_dir, config,
+        pretrained_ckpt=args.pretrained_checkpoint,
+        resume_from=args.resume_from,
+    )

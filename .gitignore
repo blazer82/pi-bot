@@ -6,4 +6,5 @@ models/piper/
 voice_trainer_output/
 venv-voice-trainer/
 piper/
+voice_trainer/data/sentences_tatoeba_de.txt
 .claude/

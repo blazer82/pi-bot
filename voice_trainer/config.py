@@ -47,11 +47,14 @@ TRAINER_CONFIG = {
         "lowpass_cutoff_hz": 7000,
     },
 
-    # Piper training
+    # Piper training (fine-tuning via piper1-gpl)
     "piper_batch_size": 32,
-    "piper_max_epochs": 10000,
-    "piper_validation_split": 0.01,
-    "piper_num_test_examples": 5,
+    "piper_max_epochs": 1000,
+    "piper_voice_name": "pi-bot",
+    "piper_espeak_voice": "de",
+    "piper_pretrained_checkpoint": "/workspace/checkpoints/pretrained.ckpt",
+    "piper_config_path": "/workspace/checkpoints/config.json",
+    "piper_cache_dir": "/workspace/cache",
 
     # pi-bot integration
     "piper_model_output_dir": os.path.join(_REPO_DIR, "models", "piper"),

@@ -2,7 +2,12 @@
 set -euo pipefail
 
 if ! command -v nvidia-smi >/dev/null 2>&1 || ! nvidia-smi >/dev/null 2>&1; then
-  echo "Error: no GPU detected. Start the RunPod pod with a GPU attached, or run this script inside the training container." >&2
+  echo "Error: no GPU detected. Start the RunPod pod with a GPU attached." >&2
+  exit 1
+fi
+
+if ! python3 -m piper.train --help >/dev/null 2>&1; then
+  echo "Error: piper.train not installed. Run setup_runpod.sh first." >&2
   exit 1
 fi
 
@@ -20,10 +25,17 @@ if [[ ! -d "${AUDIO_DIR}" ]] || ! compgen -G "${AUDIO_DIR}/*.wav" >/dev/null; th
   exit 1
 fi
 
+PRETRAINED="/workspace/checkpoints/pretrained.ckpt"
+if [[ ! -f "${PRETRAINED}" ]]; then
+  echo "Error: pretrained checkpoint not found at ${PRETRAINED}." >&2
+  echo "Run setup_runpod.sh first, or download manually." >&2
+  exit 1
+fi
+
 WAV_COUNT=$(find "${AUDIO_DIR}" -maxdepth 1 -name '*.wav' | wc -l)
 META_COUNT=$(grep -c . "${DATASET_DIR}/metadata.csv")
 echo "Dataset: ${WAV_COUNT} WAVs, ${META_COUNT} metadata entries"
 echo "Audio dir: ${AUDIO_DIR}"
 echo
 
-exec python -m voice_trainer train "$@"
+exec python3 -m voice_trainer train --pretrained-checkpoint "${PRETRAINED}" "$@"

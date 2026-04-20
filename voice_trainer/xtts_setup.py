@@ -13,7 +13,25 @@ def _get_speakers(tts) -> dict | None:
         return None
 
 
+def _patch_torch_load():
+    """Patch torch.load to default to weights_only=False for TTS compatibility."""
+    import functools
+    import torch
+
+    original = torch.load
+
+    @functools.wraps(original)
+    def patched_load(*args, **kwargs):
+        if "weights_only" not in kwargs:
+            kwargs["weights_only"] = False
+        return original(*args, **kwargs)
+
+    torch.load = patched_load
+
+
 def load_xtts(config: dict):
+    _patch_torch_load()
+
     from TTS.api import TTS
 
     model_name = config["xtts_model"]
@@ -21,6 +39,13 @@ def load_xtts(config: dict):
     print("(First run will download ~2GB — this may take a while)")
 
     tts = TTS(model_name)
+
+    import torch
+
+    if torch.cuda.is_available():
+        tts = tts.to("cuda")
+    elif torch.backends.mps.is_available():
+        tts = tts.to("mps")
 
     if hasattr(tts, "synthesizer") and hasattr(tts.synthesizer, "tts_model"):
         device = next(tts.synthesizer.tts_model.parameters()).device

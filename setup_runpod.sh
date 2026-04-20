@@ -13,9 +13,9 @@ CHECKPOINTS_DIR="/workspace/checkpoints"
 PRETRAINED_CKPT="${CHECKPOINTS_DIR}/pretrained.ckpt"
 PRETRAINED_CFG="${CHECKPOINTS_DIR}/config.json"
 
-# System dependencies
+# System dependencies (libespeak-ng-dev needed for espeakbridge C extension)
 echo "Installing system dependencies..."
-apt-get update -qq && apt-get install -y -qq espeak-ng ffmpeg > /dev/null
+apt-get update -qq && apt-get install -y -qq espeak-ng libespeak-ng-dev ffmpeg cmake > /dev/null
 echo "Done."
 echo
 
@@ -29,22 +29,61 @@ fi
 
 echo "Installing piper1-gpl..."
 cd "${PIPER_DIR}"
+pip install scikit-build cmake -q
 pip install -e ".[train]" -q
 pip install pytorch-lightning==2.1.0 -q
 bash build_monotonic_align.sh
+
+# Build espeakbridge C extension
+ESPEAK_EXT="src/piper/espeakbridge$(python3-config --extension-suffix)"
+if [[ ! -f "${ESPEAK_EXT}" ]]; then
+  echo "Building espeakbridge C extension..."
+  gcc -shared -fPIC -O2 \
+    $(python3-config --includes) \
+    -I/usr/include/espeak-ng \
+    src/piper/espeakbridge.c \
+    -o "${ESPEAK_EXT}" \
+    -lespeak-ng
+fi
+
+# Patch piper to allow PosixPath in checkpoints (newer torch requires explicit allowlist)
+PIPER_MAIN="src/piper/train/__main__.py"
+if ! grep -q "add_safe_globals" "${PIPER_MAIN}" 2>/dev/null; then
+  sed -i '1i import pathlib, torch; torch.serialization.add_safe_globals([pathlib.PosixPath])' "${PIPER_MAIN}"
+fi
+
 cd /workspace
 echo "Done."
 echo
 
 # Pretrained checkpoint
 mkdir -p "${CHECKPOINTS_DIR}"
-if [[ -f "${PRETRAINED_CKPT}" ]]; then
+if [[ -f "${PRETRAINED_CKPT}" && $(stat -c%s "${PRETRAINED_CKPT}" 2>/dev/null || echo 0) -gt 1000 ]]; then
   echo "Pretrained checkpoint already downloaded, skipping."
 else
   echo "Downloading pretrained de_DE-thorsten-medium checkpoint..."
   wget -q --show-progress \
     "https://huggingface.co/datasets/rhasspy/piper-checkpoints/resolve/main/de/de_DE/thorsten/medium/epoch%3D3135-step%3D2702056.ckpt" \
     -O "${PRETRAINED_CKPT}"
+
+  # Verify download succeeded
+  if [[ $(stat -c%s "${PRETRAINED_CKPT}" 2>/dev/null || echo 0) -lt 1000 ]]; then
+    echo "ERROR: Checkpoint download failed (file is empty/tiny)." >&2
+    echo "Download manually and transfer via: runpodctl send/receive" >&2
+    rm -f "${PRETRAINED_CKPT}"
+    exit 1
+  fi
+
+  # Strip incompatible hyperparameters from the pretrained checkpoint
+  echo "Patching checkpoint for compatibility..."
+  python3 -c "
+import pathlib, torch
+torch.serialization.add_safe_globals([pathlib.PosixPath])
+ckpt = torch.load('${PRETRAINED_CKPT}', weights_only=False, map_location='cpu')
+ckpt.pop('hyper_parameters', None)
+torch.save(ckpt, '${PRETRAINED_CKPT}')
+print('Checkpoint patched successfully')
+"
 fi
 
 if [[ -f "${PRETRAINED_CFG}" ]]; then

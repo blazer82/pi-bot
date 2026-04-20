@@ -151,7 +151,7 @@ cd /workspace
 git clone <your-repo-url> pi-bot
 cd pi-bot
 
-# One-time setup — installs piper1-gpl, downloads pretrained checkpoint
+# One-time setup — installs piper1-gpl, builds extensions, downloads pretrained checkpoint
 bash setup_runpod.sh
 
 # Upload voice_trainer_output/metadata.csv and voice_trainer_output/wavs_processed/ (or wavs/)
@@ -159,12 +159,44 @@ bash setup_runpod.sh
 
 The setup script is idempotent — if a pod restarts, rerunning it skips already-completed steps. On persistent volumes, piper1-gpl and the checkpoint survive restarts.
 
+The setup script handles:
+- System deps (`espeak-ng`, `libespeak-ng-dev`, `ffmpeg`, `cmake`)
+- Building the `espeakbridge` C extension (required for phonemization)
+- Patching torch's `weights_only` restriction for the pretrained checkpoint
+- Stripping incompatible hyperparameters from the checkpoint
+
+**Checkpoint download issues:** The HuggingFace URL for the pretrained checkpoint may fail silently (0-byte file). If setup reports a download failure, download the checkpoint manually on your local machine and transfer it:
+
+```bash
+# On your local machine — download the checkpoint
+wget "https://huggingface.co/datasets/rhasspy/piper-checkpoints/resolve/main/de/de_DE/thorsten/medium/epoch%3D3135-step%3D2702056.ckpt" \
+  -O pretrained.ckpt
+
+# Send to RunPod
+runpodctl send pretrained.ckpt
+
+# On RunPod — receive and place
+runpodctl receive <code>
+mv pretrained.ckpt /workspace/checkpoints/
+
+# Re-run setup to patch the checkpoint
+bash setup_runpod.sh
+```
+
 Then run training:
 
 ```bash
 ./train.sh                                    # defaults
 ./train.sh --batch-size 16 --max-epochs 2000  # extra flags forwarded to voice_trainer
 ```
+
+**Monitoring training:** Losses are logged to TensorBoard. Expose port 8888 when creating the pod, then:
+
+```bash
+tensorboard --logdir /workspace/pi-bot/lightning_logs --bind_all --port 8888 &
+```
+
+Open `https://<pod-id>-8888.proxy.runpod.net` in your browser. The progress bar only shows epoch/step — check TensorBoard for loss curves (`loss/g/total`, `loss/d/total`, etc.).
 
 `train.sh` checks that a GPU is visible, piper.train is installed, the corpus is present, and the pretrained checkpoint exists.
 

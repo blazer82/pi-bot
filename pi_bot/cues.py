@@ -7,6 +7,7 @@ avoid conflicts with TTS playback (which also uses sd.play/sd.wait).
 import os
 import random
 import threading
+import time
 import wave
 
 import numpy as np
@@ -133,7 +134,11 @@ def start_loop(name):
 
 
 def stop_loop():
-    """Stop the looping cue if one is running."""
+    """Stop the looping cue if one is running.
+
+    Includes a short delay after closing to let the audio device fully release
+    before TTS playback opens it again (avoids garbled output on ALSA).
+    """
     global _loop_stream
     with _loop_lock:
         if _loop_stream is None:
@@ -141,3 +146,4 @@ def stop_loop():
         _loop_stream.stop()
         _loop_stream.close()
         _loop_stream = None
+    time.sleep(0.05)

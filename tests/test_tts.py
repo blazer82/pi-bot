@@ -64,10 +64,15 @@ class TestSpeak:
         mock_run.return_value = mock.MagicMock(stdout=_make_wav(sample_rate=22050))
         speak("test")
 
-        mock_sd.play.assert_called_once()
-        mock_sd.wait.assert_called_once()
-        _, kwargs = mock_sd.play.call_args
+        mock_sd.OutputStream.assert_called_once()
+        _, kwargs = mock_sd.OutputStream.call_args
         assert kwargs["samplerate"] == 22050
+        assert kwargs["device"] == CONFIG["speaker_device"]
+        stream = mock_sd.OutputStream.return_value
+        stream.start.assert_called_once()
+        stream.write.assert_called_once()
+        stream.stop.assert_called_once()
+        stream.close.assert_called_once()
 
     @mock.patch("pi_bot.tts.sd")
     @mock.patch("pi_bot.tts.subprocess.run")

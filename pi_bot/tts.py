@@ -43,5 +43,13 @@ def speak(text):
 
     with wave.open(io.BytesIO(proc.stdout)) as wf:
         audio = np.frombuffer(wf.readframes(wf.getnframes()), dtype=np.int16)
-        sd.play(audio, samplerate=wf.getframerate())
-        sd.wait()
+        stream = sd.OutputStream(
+            samplerate=wf.getframerate(),
+            channels=1,
+            dtype="int16",
+            device=CONFIG["speaker_device"],
+        )
+        stream.start()
+        stream.write(audio.reshape(-1, 1))
+        stream.stop()
+        stream.close()

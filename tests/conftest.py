@@ -20,6 +20,11 @@ sys.modules.setdefault("openwakeword", _oww_mock)
 sys.modules.setdefault("openwakeword.model", _oww_mock)
 sys.modules.setdefault("pywhispercpp", _pwc_mock)
 sys.modules.setdefault("pywhispercpp.model", _pwc_mock)
+sys.modules.setdefault("noisereduce", mock.MagicMock())
+sys.modules.setdefault("webrtcvad", mock.MagicMock())
+sys.modules.setdefault("scipy", mock.MagicMock())
+sys.modules.setdefault("scipy.signal", mock.MagicMock())
+sys.modules.setdefault("psutil", mock.MagicMock())
 
 # ---------------------------------------------------------------------------
 # Shared test data

@@ -23,15 +23,19 @@ def calibrate_noise_floor(duration=0.5):
     tracks the actual environment instead of relying on a hard-coded value.
     """
     sr = CONFIG["sample_rate"]
+    ch = CONFIG["mic_channels"]
+    ch_sel = CONFIG["mic_channel_select"]
     samples = int(sr * duration)
     with sd.InputStream(
         samplerate=sr,
-        channels=1,
+        channels=ch,
         dtype="int16",
         blocksize=samples,
         device=CONFIG["mic_device"],
     ) as stream:
         audio, _ = stream.read(samples)
+    if ch > 1:
+        audio = audio[:, ch_sel]
     rms = np.sqrt(np.mean(audio.astype(np.float32) ** 2))
     CONFIG["silence_threshold"] = max(rms * 1.8, 100)  # floor of 100 to avoid over-sensitivity
     print(f"Noise floor calibrated: RMS={rms:.0f}, threshold={CONFIG['silence_threshold']:.0f}")
@@ -40,16 +44,20 @@ def calibrate_noise_floor(duration=0.5):
 def listen_for_wake_word(wake_model):
     """Block until the wake word is detected."""
     wake_model.reset()
+    ch = CONFIG["mic_channels"]
+    ch_sel = CONFIG["mic_channel_select"]
     chunk_size = 1280  # 80ms at 16kHz
     with sd.InputStream(
         samplerate=CONFIG["sample_rate"],
-        channels=1,
+        channels=ch,
         dtype="int16",
         blocksize=chunk_size,
         device=CONFIG["mic_device"],
     ) as stream:
         while True:
             audio, _ = stream.read(chunk_size)
+            if ch > 1:
+                audio = audio[:, ch_sel]
             prediction = wake_model.predict(audio.flatten())
             if prediction.get(_WAKE_KEY, 0) > CONFIG["wake_threshold"]:
                 return
@@ -58,6 +66,8 @@ def listen_for_wake_word(wake_model):
 def record_until_silence():
     """Record audio until silence is detected. Returns int16 numpy array."""
     sr = CONFIG["sample_rate"]
+    ch = CONFIG["mic_channels"]
+    ch_sel = CONFIG["mic_channel_select"]
     chunk_size = int(sr * 0.1)  # 100ms chunks
     silence_chunks = int(CONFIG["silence_duration"] / 0.1)
     max_chunks = int(CONFIG["max_record_seconds"] / 0.1)
@@ -68,13 +78,15 @@ def record_until_silence():
 
     with sd.InputStream(
         samplerate=sr,
-        channels=1,
+        channels=ch,
         dtype="int16",
         blocksize=chunk_size,
         device=CONFIG["mic_device"],
     ) as stream:
         for i in range(max_chunks):
             audio, _ = stream.read(chunk_size)
+            if ch > 1:
+                audio = audio[:, ch_sel]
             chunks.append(audio.copy())
 
             if i >= skip_chunks:
@@ -100,6 +112,8 @@ def wait_for_followup():
     timeout expired without any speech.
     """
     sr = CONFIG["sample_rate"]
+    ch = CONFIG["mic_channels"]
+    ch_sel = CONFIG["mic_channel_select"]
     chunk_size = int(sr * 0.1)  # 100 ms chunks
     timeout_chunks = int(CONFIG["followup_timeout"] / 0.1)
     silence_chunks_needed = int(CONFIG["silence_duration"] / 0.1)
@@ -111,7 +125,7 @@ def wait_for_followup():
 
     with sd.InputStream(
         samplerate=sr,
-        channels=1,
+        channels=ch,
         dtype="int16",
         blocksize=chunk_size,
         device=CONFIG["mic_device"],
@@ -119,6 +133,8 @@ def wait_for_followup():
         # Phase 1 — wait for speech onset
         for _ in range(timeout_chunks):
             audio, _ = stream.read(chunk_size)
+            if ch > 1:
+                audio = audio[:, ch_sel]
             rms = np.sqrt(np.mean(audio.astype(np.float32) ** 2))
             if rms >= CONFIG["silence_threshold"]:
                 speech_detected = True
@@ -131,6 +147,8 @@ def wait_for_followup():
         # Phase 2 — record until silence
         for _ in range(max_record_chunks):
             audio, _ = stream.read(chunk_size)
+            if ch > 1:
+                audio = audio[:, ch_sel]
             chunks.append(audio.copy())
             rms = np.sqrt(np.mean(audio.astype(np.float32) ** 2))
             if rms < CONFIG["silence_threshold"]:

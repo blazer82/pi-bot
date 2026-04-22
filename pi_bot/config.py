@@ -26,8 +26,10 @@ CONFIG = {
     "piper_data_dir": os.path.join(_REPO_DIR, "models", "piper"),
     # None = default, or int for multi-speaker models
     "piper_speaker": None,
-    "piper_length_scale": 1.5,              # >1.0 = slower, <1.0 = faster
+    "piper_length_scale": 1.3,              # >1.0 = slower, <1.0 = faster
     "mic_device": None,                     # None = default, or int device index
+    "mic_channels": 1,                      # channels to open (match device)
+    "mic_channel_select": 0,                # which channel to extract
     "speaker_device": None,                 # None = default, or int device index
     "sounds_dir": os.path.join(_REPO_DIR, "sounds"),
     "location_name": "Frankfurt am Main",

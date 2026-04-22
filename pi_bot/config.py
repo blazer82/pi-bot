@@ -27,7 +27,7 @@ CONFIG = {
     # None = default, or int for multi-speaker models
     "piper_speaker": None,
     "piper_length_scale": 1.3,              # >1.0 = slower, <1.0 = faster
-    "mic_device": 1,                        # None = default, or int device index
+    "mic_device": None,                     # None = default, or int device index
     "mic_channels": 2,                      # channels to open (match device)
     "mic_channel_select": 0,                # which channel to extract
     "speaker_device": None,                 # None = default, or int device index

@@ -14,6 +14,8 @@ from pi_bot.config import CONFIG
 from pi_bot.tts import speak, _check_piper
 from pi_bot.stt import transcribe, warmup
 from pi_bot.audio import (
+    open_mic,
+    close_mic,
     calibrate_noise_floor,
     listen_for_wake_word,
     record_until_silence,
@@ -36,6 +38,9 @@ def main():
     whisper_model = WhisperModel(CONFIG["whisper_model"])
     warmup(whisper_model)
 
+    print("Opening mic stream...")
+    open_mic()
+
     print("Calibrating noise floor...")
     calibrate_noise_floor()
 
@@ -54,47 +59,21 @@ def main():
     print(ready_msg)
     speak(ready_msg)
 
-    while True:
-        try:
-            print("Listening for wake word...")
-            listen_for_wake_word(wake_model)
-            print("Wake word detected!")
+    try:
+        while True:
+            try:
+                print("Listening for wake word...")
+                listen_for_wake_word(wake_model)
+                print("Wake word detected!")
 
-            # Fresh conversation context per wake-word activation
-            conversation_history = []
+                # Fresh conversation context per wake-word activation
+                conversation_history = []
 
-            play_cue("ack")
+                play_cue("ack")
 
-            # --- First utterance ---
-            print("Recording...")
-            audio = record_until_silence()
-            duration = len(audio) / CONFIG["sample_rate"]
-            print(f"Recorded {duration:.1f}s of audio")
-
-            print("Transcribing...")
-            text = transcribe(whisper_model, audio)
-            print(f"User: {text}")
-
-            if not text.strip():
-                speak(no_hear)
-                continue
-
-            print("Thinking...")
-            response, end = chat_with_ollama(text, conversation_history, jokes_db)
-            print(f"Pi-Bot: {response}")
-
-            if end:
-                print("Conversation ended by bot.")
-                continue
-
-            # --- Follow-up loop ---
-            while True:
-                print("Listening for follow-up...")
-                audio = wait_for_followup()
-                if audio is None:
-                    print("No follow-up detected, returning to wake word.")
-                    break
-
+                # --- First utterance ---
+                print("Recording...")
+                audio = record_until_silence()
                 duration = len(audio) / CONFIG["sample_rate"]
                 print(f"Recorded {duration:.1f}s of audio")
 
@@ -103,24 +82,53 @@ def main():
                 print(f"User: {text}")
 
                 if not text.strip():
-                    continue  # empty transcription — keep listening for follow-up
+                    speak(no_hear)
+                    continue
 
                 print("Thinking...")
-                response, end = chat_with_ollama(
-                    text, conversation_history, jokes_db)
+                response, end = chat_with_ollama(text, conversation_history, jokes_db)
                 print(f"Pi-Bot: {response}")
 
                 if end:
                     print("Conversation ended by bot.")
-                    break
+                    continue
 
-        except KeyboardInterrupt:
-            print("\nShutting down.")
-            break
-        except Exception as e:
-            print(f"Error: {e}")
-            play_cue("error")
-            speak(err_msg)
+                # --- Follow-up loop ---
+                while True:
+                    print("Listening for follow-up...")
+                    audio = wait_for_followup()
+                    if audio is None:
+                        print("No follow-up detected, returning to wake word.")
+                        break
+
+                    duration = len(audio) / CONFIG["sample_rate"]
+                    print(f"Recorded {duration:.1f}s of audio")
+
+                    print("Transcribing...")
+                    text = transcribe(whisper_model, audio)
+                    print(f"User: {text}")
+
+                    if not text.strip():
+                        continue  # empty transcription — keep listening for follow-up
+
+                    print("Thinking...")
+                    response, end = chat_with_ollama(
+                        text, conversation_history, jokes_db)
+                    print(f"Pi-Bot: {response}")
+
+                    if end:
+                        print("Conversation ended by bot.")
+                        break
+
+            except KeyboardInterrupt:
+                print("\nShutting down.")
+                break
+            except Exception as e:
+                print(f"Error: {e}")
+                play_cue("error")
+                speak(err_msg)
+    finally:
+        close_mic()
 
 
 def chat_mode():

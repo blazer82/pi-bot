@@ -1,14 +1,12 @@
 """Speech-to-Text via whisper.cpp."""
 
+import os
+import wave
+
 import numpy as np
-import noisereduce as nr
 import webrtcvad
-from scipy.signal import butter, sosfilt
 
 from pi_bot.config import CONFIG
-
-# Pre-compute high-pass filter coefficients (80 Hz cutoff, 4th order)
-_HP_SOS = butter(4, 80, btype="high", fs=CONFIG["sample_rate"], output="sos")
 
 # Target RMS level for AGC (empirically good for Whisper)
 _TARGET_RMS = 0.1
@@ -55,7 +53,7 @@ def _vad_filter(audio_int16, sr=CONFIG["sample_rate"], aggressiveness=2,
 def _preprocess(audio):
     """Convert int16 audio to cleaned float32 in [-1, 1].
 
-    Pipeline: VAD trim -> float32 -> high-pass filter -> noise reduction -> AGC.
+    Pipeline: VAD trim -> float32 -> AGC.
     """
     audio_int16 = audio.flatten()
 
@@ -67,14 +65,7 @@ def _preprocess(audio):
     if peak < 1e-6:
         return np.zeros_like(f32)
 
-    # 1. High-pass filter: remove low-frequency rumble / fan noise
-    f32 = sosfilt(_HP_SOS, f32)
-
-    # 2. Spectral noise reduction
-    f32 = nr.reduce_noise(y=f32, sr=CONFIG["sample_rate"], stationary=True,
-                          prop_decrease=0.8)
-
-    # 3. AGC: normalize RMS to a consistent target level
+    # AGC: normalize RMS to a consistent target level
     rms = np.sqrt(np.mean(f32 ** 2))
     if rms > 1e-6:
         gain = min(_TARGET_RMS / rms, 1.0 / np.max(np.abs(f32)))
@@ -89,8 +80,19 @@ def warmup(whisper_model):
     transcribe(whisper_model, silence)
 
 
+def _save_debug_recording(audio_int16):
+    path = os.path.join(CONFIG["debug_recording_dir"], "last_recording.wav")
+    with wave.open(path, "wb") as wf:
+        wf.setnchannels(1)
+        wf.setsampwidth(2)
+        wf.setframerate(CONFIG["sample_rate"])
+        wf.writeframes(audio_int16.tobytes())
+
+
 def transcribe(whisper_model, audio_np):
     """Transcribe int16 numpy audio to text."""
+    if CONFIG["debug_recording_dir"]:
+        _save_debug_recording(audio_np.flatten())
     audio_f32 = _preprocess(audio_np)
     segments = whisper_model.transcribe(
         audio_f32,

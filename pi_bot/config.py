@@ -31,6 +31,7 @@ CONFIG = {
     "mic_channels": 1,                      # channels to open (match device)
     "mic_channel_select": 0,                # which channel to extract
     "speaker_device": None,                 # None = default, or int device index
+    "debug_recording_dir": None,              # set to a directory path to save last_recording.wav
     "sounds_dir": os.path.join(_REPO_DIR, "sounds"),
     "location_name": "Frankfurt am Main",
     "location_lat": 50.1109,

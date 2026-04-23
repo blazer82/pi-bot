@@ -8,7 +8,7 @@ _REPO_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Configuration — edit these to taste
 # ---------------------------------------------------------------------------
 CONFIG = {
-    "ollama_model": "gemma4:e2b-it-q4_K_M",
+    "ollama_model": "gemma4:e4b-it-q4_K_M",
     "ollama_url": "http://localhost:11434",
     # context window size (lower = faster prompt eval)
     "ollama_num_ctx": 4096,

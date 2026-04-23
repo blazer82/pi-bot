@@ -51,20 +51,6 @@ def close_mic():
         _mic_stream = None
 
 
-def calibrate_noise_floor(duration=0.5):
-    """Record ambient noise and adapt the silence threshold.
-
-    Records *duration* seconds of audio, measures the RMS level, and sets
-    ``CONFIG["silence_threshold"]`` to ``rms * 1.8`` so the threshold
-    tracks the actual environment instead of relying on a hard-coded value.
-    """
-    samples = int(CONFIG["sample_rate"] * duration)
-    audio = _read_mic(samples)
-    rms = np.sqrt(np.mean(audio.astype(np.float32) ** 2))
-    CONFIG["silence_threshold"] = max(rms * 1.8, 100)
-    print(f"Noise floor calibrated: RMS={rms:.0f}, threshold={CONFIG['silence_threshold']:.0f}")
-
-
 def listen_for_wake_word(wake_model):
     """Block until the wake word is detected."""
     wake_model.reset()

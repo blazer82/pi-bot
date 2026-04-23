@@ -16,7 +16,6 @@ from pi_bot.stt import transcribe, warmup
 from pi_bot.audio import (
     open_mic,
     close_mic,
-    calibrate_noise_floor,
     listen_for_wake_word,
     record_until_silence,
     wait_for_followup,
@@ -40,9 +39,6 @@ def main():
 
     print("Opening mic stream...")
     open_mic()
-
-    print("Calibrating noise floor...")
-    calibrate_noise_floor()
 
     print("Warming up Ollama...")
     warmup_ollama()

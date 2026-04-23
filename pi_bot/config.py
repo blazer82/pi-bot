@@ -15,7 +15,7 @@ CONFIG = {
     "whisper_model": "small-q8_0",          # tiny, base, small, medium
     "wake_model": os.path.join(_REPO_DIR, "models", "hey_pee_bot.onnx"),
     "wake_threshold": 0.5,                  # 0.0–1.0
-    "silence_threshold": 500,               # RMS energy below this = silence
+    "silence_threshold": 150,               # RMS energy below this = silence
     "silence_duration": 1.5,                # seconds of silence to stop recording
     "max_record_seconds": 15,               # safety cap
     "sample_rate": 16000,

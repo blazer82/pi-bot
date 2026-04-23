@@ -18,3 +18,4 @@ from pi_bot.chat import (
     stream_and_speak,
     chat_with_ollama,
 )
+from pi_bot.display import init_display, show_user_text, show_bot_text

@@ -9,6 +9,7 @@ from pi_bot.config import CONFIG, TOOLS, SYSTEM_PROMPT_DE
 from pi_bot.tts import speak
 from pi_bot.tools import execute_tool
 from pi_bot.cues import play as play_cue, start_loop, stop_loop
+from pi_bot.display import show_thinking, show_bot_text
 
 
 def _ollama_chat_stream(messages, tools=None):
@@ -127,6 +128,7 @@ def stream_and_speak(messages, tools=None):
     the conversation history matches the KV cache prefix on the next turn.
     """
     start_loop("thinking")
+    show_thinking()
 
     buffer = ""
     raw_chunks = []       # exact text from Ollama for KV cache compatibility
@@ -150,8 +152,10 @@ def stream_and_speak(messages, tools=None):
                 stop_loop()
                 remainder, parts = _split_sentences(pre)
                 for p in parts:
+                    show_bot_text(p)
                     speak(p)
                 if remainder.strip():
+                    show_bot_text(remainder.strip())
                     speak(remainder.strip())
             in_think = True
             buffer = post
@@ -173,12 +177,14 @@ def stream_and_speak(messages, tools=None):
         if parts:
             stop_loop()
             for p in parts:
+                show_bot_text(p)
                 speak(p)
 
     # Speak any remaining text in the buffer
     stop_loop()
     leftover = buffer.strip()
     if leftover and not in_think:
+        show_bot_text(leftover)
         speak(leftover)
 
     # Build raw response preserving Ollama's exact whitespace, only strip

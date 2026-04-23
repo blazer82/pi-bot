@@ -42,6 +42,7 @@ pi_bot/
   audio.py    — listen_for_wake_word(), record_until_silence(), wait_for_followup()
   tools.py    — tool implementations (weather, system status, jokes) + execute_tool() dispatcher
   chat.py     — Ollama streaming, sentence-by-sentence speech, chat_with_ollama() orchestration
+  display.py  — FT81x display output (optional, gracefully skipped if unavailable)
   main.py     — main loop, chat_mode(), CLI entry point
 ```
 

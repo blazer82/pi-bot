@@ -128,6 +128,15 @@ echo ""
 echo "sounddevice devices:"
 python3 -c "import sounddevice; print(sounddevice.query_devices())"
 
+# -----------------------------------------------------------------------
+# 8. FT81x display driver
+# -----------------------------------------------------------------------
+echo ""
+echo "--- Installing FT81x display driver ---"
+sudo apt install -y libgpiod-dev
+pip install "ft81x @ git+https://github.com/blazer82/FT81x_Python_Driver.git"
+echo "FT81x display driver installed."
+
 echo ""
 echo "=== Setup complete! ==="
 echo ""

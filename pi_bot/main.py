@@ -22,6 +22,9 @@ from pi_bot.audio import (
 )
 from pi_bot.chat import chat_with_ollama, warmup_ollama
 from pi_bot.cues import play as play_cue, start_loop, stop_loop
+from pi_bot.display import (
+    init_display, close_display, show_ready, show_listening, show_user_text,
+)
 
 # jokes.json lives in the repository root, one level above this file
 _REPO_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -29,6 +32,7 @@ _REPO_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def main():
     print("Pi-Bot starting up...")
+    init_display()
 
     print("Loading wake word model...")
     wake_model = WakeModel(wakeword_model_paths=[CONFIG["wake_model"]])
@@ -54,6 +58,7 @@ def main():
     ready_msg = "Pi Bot ist bereit."
     print(ready_msg)
     speak(ready_msg)
+    show_ready()
 
     try:
         while True:
@@ -61,6 +66,7 @@ def main():
                 print("Listening for wake word...")
                 listen_for_wake_word(wake_model)
                 print("Wake word detected!")
+                show_listening()
 
                 # Fresh conversation context per wake-word activation
                 conversation_history = []
@@ -79,6 +85,7 @@ def main():
                 print("Transcribing...")
                 text = transcribe(whisper_model, audio)
                 print(f"User: {text}")
+                show_user_text(text)
 
                 if not text.strip():
                     stop_loop()
@@ -96,6 +103,7 @@ def main():
                 # --- Follow-up loop ---
                 while True:
                     print("Listening for follow-up...")
+                    show_listening()
                     audio = wait_for_followup()
                     if audio is None:
                         print("No follow-up detected, returning to wake word.")
@@ -110,6 +118,7 @@ def main():
                     print("Transcribing...")
                     text = transcribe(whisper_model, audio)
                     print(f"User: {text}")
+                    show_user_text(text)
 
                     if not text.strip():
                         stop_loop()
@@ -134,6 +143,7 @@ def main():
                 speak(err_msg)
     finally:
         close_mic()
+        close_display()
 
 
 def chat_mode():

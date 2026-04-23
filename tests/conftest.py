@@ -22,6 +22,7 @@ sys.modules.setdefault("pywhispercpp", _pwc_mock)
 sys.modules.setdefault("pywhispercpp.model", _pwc_mock)
 sys.modules.setdefault("webrtcvad", mock.MagicMock())
 sys.modules.setdefault("psutil", mock.MagicMock())
+sys.modules.setdefault("ft81x", mock.MagicMock())
 
 # ---------------------------------------------------------------------------
 # Shared test data

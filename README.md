@@ -9,6 +9,12 @@ A voice-activated conversational robot running on Raspberry Pi 5. Uses openWakeW
 - USB audio interface + speakers
 - Raspberry Pi OS Bookworm (64-bit)
 
+## Display (Optional)
+
+Pi-Bot supports an optional 480x480 FT81x-based display connected via SPI. It shows the current conversation: transcribed user input and bot responses, updated sentence-by-sentence as the bot speaks.
+
+The display driver is installed automatically by `setup.sh`. If no display is connected, Pi-Bot runs normally without it. See the [FT81x Python Driver](https://github.com/blazer82/FT81x_Python_Driver) for wiring details.
+
 ## Quick Start
 
 ```bash

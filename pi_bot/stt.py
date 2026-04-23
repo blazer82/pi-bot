@@ -94,12 +94,17 @@ def transcribe(whisper_model, audio_np):
     if CONFIG["debug_recording_dir"]:
         _save_debug_recording(audio_np.flatten())
     audio_f32 = _preprocess(audio_np)
+    # Limit audio context to actual speech length (+10% margin) so whisper
+    # doesn't attend over 30s of padded silence.  100 mel frames ≈ 1 second.
+    mel_frames = int(len(audio_f32) / CONFIG["sample_rate"] * 100 * 1.1)
+    mel_frames = max(mel_frames, 64)
     segments = whisper_model.transcribe(
         audio_f32,
         language="de",
         n_threads=4,
         no_context=True,
         initial_prompt="Hallo, wie geht es dir heute?",
+        audio_ctx=mel_frames,
     )
     text = " ".join(seg.text for seg in segments).strip()
     return text

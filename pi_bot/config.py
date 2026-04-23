@@ -12,7 +12,7 @@ CONFIG = {
     "ollama_url": "http://localhost:11434",
     # context window size (lower = faster prompt eval)
     "ollama_num_ctx": 4096,
-    "whisper_model": "base",                # tiny, base, small, medium
+    "whisper_model": "small",                # tiny, base, small, medium
     "wake_model": os.path.join(_REPO_DIR, "models", "hey_pee_bot.onnx"),
     "wake_threshold": 0.5,                  # 0.0–1.0
     "silence_threshold": 500,               # RMS energy below this = silence

@@ -69,7 +69,7 @@ def main():
                 # Fresh conversation context per wake-word activation
                 conversation_history = []
 
-                play_cue("ack")
+                speak("Ja?")
 
                 # --- First utterance ---
                 print("Recording...")

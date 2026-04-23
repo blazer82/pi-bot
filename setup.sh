@@ -51,8 +51,8 @@ export OMP_NUM_THREADS=4
 # 3. Download whisper.cpp 'base' model
 # -----------------------------------------------------------------------
 echo ""
-echo "--- Pre-downloading whisper 'base' model ---"
-python3 -c "from pywhispercpp.model import Model; Model('base')"
+echo "--- Pre-downloading whisper 'small' model ---"
+python3 -c "from pywhispercpp.model import Model; Model('small')"
 
 # -----------------------------------------------------------------------
 # 4. Install ollama

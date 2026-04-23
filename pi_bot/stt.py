@@ -9,7 +9,7 @@ import webrtcvad
 from pi_bot.config import CONFIG
 
 # Target RMS level for AGC (empirically good for Whisper)
-_TARGET_RMS = 0.1
+_TARGET_RMS = 0.2
 
 
 def _vad_filter(audio_int16, sr=CONFIG["sample_rate"], aggressiveness=2,
@@ -68,8 +68,8 @@ def _preprocess(audio):
     # AGC: normalize RMS to a consistent target level
     rms = np.sqrt(np.mean(f32 ** 2))
     if rms > 1e-6:
-        gain = min(_TARGET_RMS / rms, 1.0 / np.max(np.abs(f32)))
-        f32 = f32 * gain
+        gain = _TARGET_RMS / rms
+        f32 = np.clip(f32 * gain, -1.0, 1.0)
 
     return f32
 
@@ -98,9 +98,8 @@ def transcribe(whisper_model, audio_np):
         audio_f32,
         language="de",
         n_threads=4,
-        single_segment=True,
         no_context=True,
-        audio_ctx=768,
+        initial_prompt="Hallo, wie geht es dir heute?",
     )
     text = " ".join(seg.text for seg in segments).strip()
     return text

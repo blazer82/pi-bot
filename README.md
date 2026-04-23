@@ -37,7 +37,7 @@ Then type `/bye` to exit the interactive session — the model stays resident.
 
 1. Continuously listens for the wake word ("Hey Pee Bot")
 2. On detection, plays an acknowledgment ("Ja?") and records until silence
-3. Transcribes speech with whisper.cpp (base model)
+3. Transcribes speech with whisper.cpp (small model)
 4. Sends transcript to Gemma 4 via ollama, with tool definitions
 5. If the model calls a tool (e.g., joke lookup), executes it and feeds results back
 6. Speaks the final response via espeak-ng
@@ -50,7 +50,7 @@ Edit the `CONFIG` dict at the top of `pi_bot.py`:
 | -------------------- | --------------------------- | -------------------------------------------- |
 | `language`           | `"de"`                      | `"de"` for German, `"en"` for English        |
 | `ollama_model`       | `"gemma4:e4b-it-q4_K_M"`    | Ollama model tag                             |
-| `whisper_model`      | `"base"`                    | Whisper model size (tiny/base/small/medium)  |
+| `whisper_model`      | `"small"`                   | Whisper model size (tiny/base/small/medium)  |
 | `wake_model`         | `"models/hey_pee_bot.onnx"` | Path to custom openWakeWord `.onnx` model    |
 | `wake_threshold`     | `0.5`                       | Wake word confidence threshold (0.0-1.0)     |
 | `silence_threshold`  | `500`                       | RMS energy below this = silence              |

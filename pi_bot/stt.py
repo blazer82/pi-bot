@@ -103,7 +103,6 @@ def transcribe(whisper_model, audio_np):
         language="de",
         n_threads=4,
         no_context=True,
-        initial_prompt="Hallo, wie geht es dir heute?",
         audio_ctx=mel_frames,
     )
     text = " ".join(seg.text for seg in segments).strip()

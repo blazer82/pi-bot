@@ -52,7 +52,7 @@ export OMP_NUM_THREADS=4
 # -----------------------------------------------------------------------
 echo ""
 WHISPER_DIR="$HOME/.local/share/pywhispercpp/models"
-WHISPER_MODEL="ggml-small-q5_1.bin"
+WHISPER_MODEL="ggml-small-q8_0.bin"
 echo "--- Downloading whisper $WHISPER_MODEL ---"
 mkdir -p "$WHISPER_DIR"
 if [ ! -f "$WHISPER_DIR/$WHISPER_MODEL" ]; then

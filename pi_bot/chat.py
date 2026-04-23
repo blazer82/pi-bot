@@ -235,7 +235,8 @@ def chat_with_ollama(user_text, conversation_history, jokes_db):
         # Stream the post-tool response too
         raw_response, tool_calls = stream_and_speak(messages, tools=TOOLS)
 
-    play_cue("done")
+    if not end_conversation:
+        play_cue("done")
 
     # Append to history — no trimming here, trim happens at the start of
     # the next call so the prefix stays stable between turns.

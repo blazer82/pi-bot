@@ -48,11 +48,20 @@ fi
 export OMP_NUM_THREADS=4
 
 # -----------------------------------------------------------------------
-# 3. Download whisper.cpp 'base' model
+# 3. Download quantized whisper.cpp 'small' model
 # -----------------------------------------------------------------------
 echo ""
-echo "--- Pre-downloading whisper 'small' model ---"
-python3 -c "from pywhispercpp.model import Model; Model('small')"
+WHISPER_DIR="$HOME/.local/share/pywhispercpp/models"
+WHISPER_MODEL="ggml-small-q5_1.bin"
+echo "--- Downloading whisper $WHISPER_MODEL ---"
+mkdir -p "$WHISPER_DIR"
+if [ ! -f "$WHISPER_DIR/$WHISPER_MODEL" ]; then
+    curl -fsSL -o "$WHISPER_DIR/$WHISPER_MODEL" \
+        "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/$WHISPER_MODEL"
+    echo "Whisper model downloaded."
+else
+    echo "Whisper model already present."
+fi
 
 # -----------------------------------------------------------------------
 # 4. Install ollama

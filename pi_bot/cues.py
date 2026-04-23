@@ -17,6 +17,7 @@ from pi_bot.config import CONFIG
 
 _cache = {}  # name -> (audio_array, sample_rate)
 _loop_stream = None
+_loop_name = None
 _loop_lock = threading.Lock()
 
 
@@ -77,8 +78,13 @@ def start_loop(name):
 
     When *name* is ``"thinking"``, plays jingle1–jingle10 in shuffled order,
     reshuffling when all have played.  Other names loop a single file.
+
+    Idempotent: if *name* is already looping, returns immediately.
     """
-    global _loop_stream
+    global _loop_stream, _loop_name
+    with _loop_lock:
+        if _loop_name == name and _loop_stream is not None:
+            return
     stop_loop()
 
     if name == "thinking":
@@ -123,6 +129,7 @@ def start_loop(name):
                 written += chunk
 
     with _loop_lock:
+        _loop_name = name
         _loop_stream = sd.OutputStream(
             samplerate=rate,
             channels=1,
@@ -139,11 +146,12 @@ def stop_loop():
     Includes a short delay after closing to let the audio device fully release
     before TTS playback opens it again (avoids garbled output on ALSA).
     """
-    global _loop_stream
+    global _loop_stream, _loop_name
     with _loop_lock:
         if _loop_stream is None:
             return
         _loop_stream.stop()
         _loop_stream.close()
         _loop_stream = None
+        _loop_name = None
     time.sleep(0.05)

@@ -207,7 +207,6 @@ def chat_with_ollama(user_text, conversation_history, jokes_db):
     messages.extend(conversation_history)
     messages.append({"role": "user", "content": user_text})
 
-    play_cue("ack")
     raw_response, tool_calls = stream_and_speak(
         messages, tools=TOOLS)
 

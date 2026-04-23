@@ -22,7 +22,7 @@ from pi_bot.audio import (
     wait_for_followup,
 )
 from pi_bot.chat import chat_with_ollama, warmup_ollama
-from pi_bot.cues import play as play_cue
+from pi_bot.cues import play as play_cue, start_loop, stop_loop
 
 # jokes.json lives in the repository root, one level above this file
 _REPO_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -77,11 +77,15 @@ def main():
                 duration = len(audio) / CONFIG["sample_rate"]
                 print(f"Recorded {duration:.1f}s of audio")
 
+                play_cue("ack")
+                start_loop("thinking")
+
                 print("Transcribing...")
                 text = transcribe(whisper_model, audio)
                 print(f"User: {text}")
 
                 if not text.strip():
+                    stop_loop()
                     speak(no_hear)
                     continue
 
@@ -104,11 +108,15 @@ def main():
                     duration = len(audio) / CONFIG["sample_rate"]
                     print(f"Recorded {duration:.1f}s of audio")
 
+                    play_cue("ack")
+                    start_loop("thinking")
+
                     print("Transcribing...")
                     text = transcribe(whisper_model, audio)
                     print(f"User: {text}")
 
                     if not text.strip():
+                        stop_loop()
                         continue  # empty transcription — keep listening for follow-up
 
                     print("Thinking...")
@@ -125,6 +133,7 @@ def main():
                 break
             except Exception as e:
                 print(f"Error: {e}")
+                stop_loop()
                 play_cue("error")
                 speak(err_msg)
     finally:

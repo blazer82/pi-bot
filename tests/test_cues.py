@@ -98,6 +98,40 @@ class TestLoop:
     def test_stop_when_not_running(self):
         cues.stop_loop()
 
+    def test_start_loop_idempotent_same_name(self):
+        _make_wav(os.path.join(self._tmpdir, "beep.wav"))
+        sd = cues.sd
+        sd.reset_mock()
+
+        cues.start_loop("beep")
+        assert sd.OutputStream.call_count == 1
+
+        cues.start_loop("beep")
+        assert sd.OutputStream.call_count == 1
+        assert cues._loop_stream is not None
+
+    def test_start_loop_different_name_restarts(self):
+        _make_wav(os.path.join(self._tmpdir, "beep.wav"))
+        _make_wav(os.path.join(self._tmpdir, "boop.wav"))
+        sd = cues.sd
+        sd.reset_mock()
+
+        cues.start_loop("beep")
+        assert sd.OutputStream.call_count == 1
+
+        cues.start_loop("boop")
+        assert sd.OutputStream.call_count == 2
+
+    def test_stop_loop_clears_name(self):
+        _make_wav(os.path.join(self._tmpdir, "beep.wav"))
+        sd = cues.sd
+        sd.reset_mock()
+
+        cues.start_loop("beep")
+        cues.stop_loop()
+        cues.start_loop("beep")
+        assert sd.OutputStream.call_count == 2
+
     def test_start_loop_missing_file(self):
         cues.start_loop("nonexistent")
         assert cues._loop_stream is None
